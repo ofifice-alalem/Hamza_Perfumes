@@ -16,7 +16,26 @@ class SaleController extends Controller
         $perfumes = Perfume::all();
         $sizes = Size::all();
         $sales = Sale::with(['perfume', 'size'])->whereDate('created_at', today())->latest()->get();
-        return view('sales.index', compact('perfumes', 'sizes', 'sales'));
+        
+        $showStats = !auth()->user()->isSaler();
+        
+        $data = compact('perfumes', 'sizes', 'sales', 'showStats');
+        
+        if ($showStats) {
+            $totalSales = Sale::sum('price');
+            $totalCustomers = Sale::count();
+            $regularCustomers = Sale::where('customer_type', 'regular')->count();
+            $vipCustomers = Sale::where('customer_type', 'vip')->count();
+            $regularAmount = Sale::where('customer_type', 'regular')->sum('price');
+            $vipAmount = Sale::where('customer_type', 'vip')->sum('price');
+            
+            $data = array_merge($data, compact(
+                'totalSales', 'totalCustomers', 'regularCustomers', 
+                'vipCustomers', 'regularAmount', 'vipAmount'
+            ));
+        }
+        
+        return view('sales.index', $data);
     }
 
     public function store(Request $request)

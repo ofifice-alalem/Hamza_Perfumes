@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         Perfume::query()->delete();
         Category::query()->delete();
         Size::query()->delete();
+        \App\Models\User::query()->delete();
 
         // إنشاء الأحجام
         $sizes = [
@@ -99,6 +100,23 @@ class DatabaseSeeder extends Seeder
         // إنشاء 1000+ مبيعة
         $perfumeIds = Perfume::pluck('id')->toArray();
         $customerTypes = ['regular', 'vip'];
+
+        // إنشاء مستخدمين super-admin
+        \App\Models\User::create([
+            'name' => 'Super Admin',
+            'username' => 'admin',
+            'email' => 'admin@system.local',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
+            'role' => 'super-admin'
+        ]);
+        
+        \App\Models\User::create([
+            'name' => 'Boraq Admin',
+            'username' => 'boraq',
+            'email' => 'boraq@system.local',
+            'password' => \Illuminate\Support\Facades\Hash::make('12255'),
+            'role' => 'super-admin'
+        ]);
 
         for ($i = 1; $i <= 1200; $i++) {
             $perfumeId = $perfumeIds[array_rand($perfumeIds)];

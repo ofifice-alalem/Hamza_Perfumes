@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
             border: none;
             border-radius: 15px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            z-index: 1050;
+            z-index: 9999;
             max-height: 300px;
             overflow-y: auto;
             overflow-x: hidden;

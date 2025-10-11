@@ -43,12 +43,21 @@
                 </button>
                 <!-- Center nav links (desktop) - moved to start position -->
                 <nav class="nav-links d-none d-md-flex align-items-center" style="gap: 24px;">
-                    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">لوحة التحكم</a>
-                    <a class="nav-link {{ request()->routeIs('perfumes.*') ? 'active' : '' }}" href="{{ route('perfumes.index') }}">العطور</a>
-                    <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">التصنيفات</a>
-                    <a class="nav-link {{ request()->routeIs('sizes.*') ? 'active' : '' }}" href="{{ route('sizes.index') }}">الأحجام</a>
-                    <a class="nav-link {{ request()->routeIs('prices.*') ? 'active' : '' }}" href="{{ route('prices.index') }}">الأسعار</a>
-                    <a class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">المبيعات</a>
+                    @auth
+                        @if(auth()->user()->isSuperAdmin())
+                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">لوحة التحكم</a>
+                            <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">المستخدمين</a>
+                        @endif
+                        
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->isAdmin())
+                            <a class="nav-link {{ request()->routeIs('perfumes.*') ? 'active' : '' }}" href="{{ route('perfumes.index') }}">العطور</a>
+                            <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">التصنيفات</a>
+                            <a class="nav-link {{ request()->routeIs('sizes.*') ? 'active' : '' }}" href="{{ route('sizes.index') }}">الأحجام</a>
+                            <a class="nav-link {{ request()->routeIs('prices.*') ? 'active' : '' }}" href="{{ route('prices.index') }}">الأسعار</a>
+                        @endif
+                        
+                        <a class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">المبيعات</a>
+                    @endauth
                 </nav>
                 <!-- Right actions (desktop) -->
                 <div class="search-section d-none d-md-flex">
@@ -57,9 +66,42 @@
                         <i class="fas fa-search search-icon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
                     </div>
                     <div class="header-icons">
-                        <button class="icon-btn"><i class="fas fa-bell"></i></button>
-                        <button class="icon-btn"><i class="fas fa-cog"></i></button>
-                        <div class="user-avatar">س</div>
+                        @auth
+                            <div class="dropdown">
+                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 25px; padding: 12px 20px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 1rem;">
+                                    <i class="fas fa-user me-2" style="font-size: 0.9rem;"></i>
+                                    {{ auth()->user()->name }}
+                                </button>
+                                <ul class="dropdown-menu" style="border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: none; padding: 8px 0; min-width: 200px;">
+                                    <li>
+                                        <div class="dropdown-item-text px-3 py-2" style="border-bottom: 1px solid #f0f0f0;">
+                                            <div class="fw-bold text-dark">{{ auth()->user()->name }}</div>
+                                            <small class="text-muted">
+                                                @if(auth()->user()->role === 'super-admin')
+                                                    مدير عام
+                                                @elseif(auth()->user()->role === 'admin')
+                                                    مدير
+                                                @else
+                                                    بائع
+                                                @endif
+                                            </small>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <form action="{{ route('logout') }}" method="POST" class="d-inline w-100">
+                                            @csrf
+                                            <button type="submit" class="dropdown-item d-flex align-items-center" style="padding: 12px 20px; border-radius: 10px; margin: 4px 8px; transition: all 0.3s; color: #dc3545;">
+                                                <i class="fas fa-sign-out-alt me-3"></i>تسجيل الخروج
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        @else
+                            <a href="{{ route('login') }}" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
+                            </a>
+                        @endauth
                     </div>
                 </div>
             </div>
@@ -76,24 +118,35 @@
             </div>
             <div class="offcanvas-body p-0">
                 <nav class="nav flex-column">
-                    <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                        <i class="fas fa-tachometer-alt me-3"></i>لوحة التحكم
-                    </a>
-                    <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('perfumes.*') ? 'active' : '' }}" href="{{ route('perfumes.index') }}">
-                        <i class="fas fa-spray-can me-3"></i>العطور
-                    </a>
-                    <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
-                        <i class="fas fa-tags me-3"></i>التصنيفات
-                    </a>
-                    <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('sizes.*') ? 'active' : '' }}" href="{{ route('sizes.index') }}">
-                        <i class="fas fa-ruler me-3"></i>الأحجام
-                    </a>
-                    <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('prices.*') ? 'active' : '' }}" href="{{ route('prices.index') }}">
-                        <i class="fas fa-dollar-sign me-3"></i>الأسعار
-                    </a>
-                    <a class="nav-link py-3 px-4 {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">
-                        <i class="fas fa-chart-line me-3"></i>المبيعات
-                    </a>
+                    @auth
+                        @if(auth()->user()->isSuperAdmin())
+                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-3"></i>لوحة التحكم
+                            </a>
+                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                                <i class="fas fa-users me-3"></i>المستخدمين
+                            </a>
+                        @endif
+                        
+                        @if(auth()->user()->isSuperAdmin() || auth()->user()->isAdmin())
+                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('perfumes.*') ? 'active' : '' }}" href="{{ route('perfumes.index') }}">
+                                <i class="fas fa-spray-can me-3"></i>العطور
+                            </a>
+                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
+                                <i class="fas fa-tags me-3"></i>التصنيفات
+                            </a>
+                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('sizes.*') ? 'active' : '' }}" href="{{ route('sizes.index') }}">
+                                <i class="fas fa-ruler me-3"></i>الأحجام
+                            </a>
+                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('prices.*') ? 'active' : '' }}" href="{{ route('prices.index') }}">
+                                <i class="fas fa-dollar-sign me-3"></i>الأسعار
+                            </a>
+                        @endif
+                        
+                        <a class="nav-link py-3 px-4 {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">
+                            <i class="fas fa-chart-line me-3"></i>المبيعات
+                        </a>
+                    @endauth
                 </nav>
             </div>
         </div>
