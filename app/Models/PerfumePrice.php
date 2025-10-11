@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PerfumePrice extends Model
 {
-    protected $fillable = ['perfume_id', 'size_id', 'price_regular', 'price_vip'];
+    protected $fillable = ['perfume_id', 'size_id', 'bottle_size', 'bottle_price', 'price_regular', 'price_vip'];
 
     public function perfume(): BelongsTo
     {

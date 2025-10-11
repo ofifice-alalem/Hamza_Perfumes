@@ -8,8 +8,16 @@ use App\Http\Controllers\PerfumePriceController;
 use App\Http\Controllers\CategoryController;
 
 Route::get('/', function () {
-    return redirect()->route('perfumes.index');
+    return view('dashboard');
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::get('/perfumes/check-unique', [PerfumeController::class, 'checkUnique'])->name('perfumes.checkUnique');
+Route::get('/perfumes/search', [PerfumeController::class, 'search'])->name('perfumes.search');
+Route::get('/perfumes/search-uncategorized', [PerfumeController::class, 'searchUncategorized'])->name('perfumes.searchUncategorized');
 
 Route::resource('perfumes', PerfumeController::class);
 Route::resource('sizes', SizeController::class);

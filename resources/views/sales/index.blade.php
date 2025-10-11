@@ -3,23 +3,30 @@
 @section('title', 'المبيعات')
 
 @section('content')
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1"><i class="fas fa-chart-line me-2 text-primary"></i>المبيعات</h2>
+        <p class="text-muted mb-0">إدارة مبيعات العطور ومتابعة الإيرادات</p>
+    </div>
+</div>
+
 <div class="row">
     <!-- نموذج البيع -->
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
+        <div class="card-modern">
+            <div class="card-header bg-primary text-white" style="border-radius: 15px 15px 0 0;">
                 <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>بيع جديد</h5>
             </div>
             <div class="card-body">
                 <form action="{{ route('sales.store') }}" method="POST" id="saleForm">
                     @csrf
                     <div class="mb-3">
-                        <label for="perfume_id" class="form-label">العطر</label>
+                        <label for="perfume_id" class="form-label fw-semibold">العطر</label>
                         <select class="form-select @error('perfume_id') is-invalid @enderror" 
-                                id="perfume_id" name="perfume_id" required>
+                                id="perfume_id" name="perfume_id" required style="border-radius: 10px;">
                             <option value="">اختر العطر</option>
                             @foreach($perfumes as $perfume)
-                                <option value="{{ $perfume->id }}">{{ $perfume->name }}</option>
+                                <option value="{{ $perfume->id }}" {{ request('perfume_id') == $perfume->id ? 'selected' : '' }}>{{ $perfume->name }}</option>
                             @endforeach
                         </select>
                         @error('perfume_id')
@@ -28,9 +35,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="size_id" class="form-label">الحجم</label>
+                        <label for="size_id" class="form-label fw-semibold">الحجم</label>
                         <select class="form-select @error('size_id') is-invalid @enderror" 
-                                id="size_id" name="size_id" required>
+                                id="size_id" name="size_id" required style="border-radius: 10px;">
                             <option value="">اختر الحجم</option>
                             @foreach($sizes as $size)
                                 <option value="{{ $size->id }}">{{ $size->label }}</option>
@@ -42,9 +49,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="customer_type" class="form-label">نوع العميل</label>
+                        <label for="customer_type" class="form-label fw-semibold">نوع العميل</label>
                         <select class="form-select @error('customer_type') is-invalid @enderror" 
-                                id="customer_type" name="customer_type" required>
+                                id="customer_type" name="customer_type" required style="border-radius: 10px;">
                             <option value="">اختر نوع العميل</option>
                             <option value="regular">عادي</option>
                             <option value="vip">VIP</option>
@@ -55,13 +62,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">السعر</label>
-                        <div class="alert alert-info" id="priceDisplay">
-                            اختر العطر والحجم ونوع العميل لعرض السعر
+                        <label class="form-label fw-semibold">السعر</label>
+                        <div class="alert alert-info" id="priceDisplay" style="border-radius: 10px;">
+                            <i class="fas fa-info-circle me-2"></i>اختر العطر والحجم ونوع العميل لعرض السعر
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100" id="sellBtn" disabled>
+                    <button type="submit" class="btn btn-success w-100 btn-modern" id="sellBtn" disabled>
                         <i class="fas fa-shopping-cart me-2"></i>بيع
                     </button>
                 </form>
@@ -71,50 +78,94 @@
 
     <!-- سجل المبيعات -->
     <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="fas fa-list me-2"></i>سجل المبيعات</h5>
+        @if($sales->count() > 0)
+            <!-- إحصائيات سريعة -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stats-card">
+                        <div class="stats-number">{{ $sales->count() }}</div>
+                        <div class="stats-label">إجمالي المبيعات</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #ff6b35, #f7931e);">
+                        <div class="stats-number">{{ number_format($sales->sum('price'), 0) }}</div>
+                        <div class="stats-label">إجمالي الإيرادات (ريال)</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <div class="stats-number">{{ $sales->where('customer_type', 'vip')->count() }}</div>
+                        <div class="stats-label">عملاء VIP</div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                @if($sales->count() > 0)
+
+            <div class="card-modern">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>سجل المبيعات</h5>
+                    <span class="badge bg-primary px-3 py-2">{{ $sales->count() }} عملية بيع</span>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-striped">
+                        <table class="table table-modern mb-0">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>العطر</th>
-                                    <th>الحجم</th>
-                                    <th>نوع العميل</th>
-                                    <th>السعر</th>
-                                    <th>التاريخ</th>
+                                    <th class="border-0">#</th>
+                                    <th class="border-0">العطر</th>
+                                    <th class="border-0">الحجم</th>
+                                    <th class="border-0">نوع العميل</th>
+                                    <th class="border-0">السعر</th>
+                                    <th class="border-0">التاريخ</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($sales as $sale)
                                 <tr>
-                                    <td>{{ $sale->id }}</td>
-                                    <td>{{ $sale->perfume->name }}</td>
-                                    <td>{{ $sale->size->label }}</td>
+                                    <td class="fw-bold">{{ $sale->id }}</td>
                                     <td>
-                                        <span class="badge {{ $sale->customer_type === 'vip' ? 'bg-warning' : 'bg-secondary' }}">
+                                        <div class="d-flex align-items-center">
+                                            <div class="project-icon me-3" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                                                {{ substr($sale->perfume->name, 0, 1) }}
+                                            </div>
+                                            <span class="fw-semibold">{{ $sale->perfume->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary px-3 py-2" style="border-radius: 15px;">
+                                            <i class="fas fa-ruler me-1"></i>{{ $sale->size->label }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {{ $sale->customer_type === 'vip' ? 'bg-warning' : 'bg-info' }} px-3 py-2" style="border-radius: 15px;">
+                                            <i class="fas {{ $sale->customer_type === 'vip' ? 'fa-crown' : 'fa-user' }} me-1"></i>
                                             {{ $sale->customer_type === 'vip' ? 'VIP' : 'عادي' }}
                                         </span>
                                     </td>
-                                    <td>{{ number_format($sale->price, 2) }} ريال</td>
-                                    <td>{{ $sale->created_at->format('Y-m-d H:i') }}</td>
+                                    <td>
+                                        <span class="fw-bold text-success">
+                                            <i class="fas fa-dollar-sign me-1"></i>{{ number_format($sale->price, 2) }} ريال
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>{{ $sale->created_at->format('Y-m-d H:i') }}
+                                        </span>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-                @else
-                    <div class="text-center py-4">
-                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-                        <p class="text-muted">لا توجد مبيعات بعد</p>
-                    </div>
-                @endif
+                </div>
             </div>
-        </div>
+        @else
+            <div class="empty-state">
+                <i class="fas fa-shopping-cart"></i>
+                <h4 class="text-muted mb-3">لا توجد مبيعات بعد</h4>
+                <p class="text-muted mb-4">ابدأ ببيع عطورك الأولى</p>
+            </div>
+        @endif
     </div>
 </div>
 
@@ -159,4 +210,16 @@ document.addEventListener('DOMContentLoaded', function() {
     customerTypeSelect.addEventListener('change', updatePrice);
 });
 </script>
+
+<style>
+/* Table Row Styling */
+.table-modern tbody tr {
+    background-color: #ffffff;
+    transition: background-color 0.2s ease;
+}
+
+.table-modern tbody tr:hover >*{
+    background-color: #f5f5f5;
+}
+</style>
 @endsection

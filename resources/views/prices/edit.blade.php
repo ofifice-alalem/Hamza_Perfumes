@@ -20,7 +20,37 @@
                         <input type="text" class="form-control" value="{{ $price->perfume->name }}" readonly>
                     </div>
 
-                    <h5 class="mb-3">الأسعار حسب الأحجام</h5>
+                    <!-- معلومات العبوة الكاملة -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="bottle_size" class="form-label fw-semibold">حجم العبوة الكاملة</label>
+                            <input type="text" 
+                                   class="form-control @error('bottle_size') is-invalid @enderror" 
+                                   id="bottle_size" 
+                                   name="bottle_size" 
+                                   value="{{ old('bottle_size', $price->bottle_size) }}"
+                                   placeholder="مثال: 100 مل"
+                                   style="border-radius: 12px; padding: 12px 14px;">
+                            @error('bottle_size')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label for="bottle_price" class="form-label fw-semibold">سعر العبوة (ريال)</label>
+                            <input type="number" step="0.01" 
+                                   class="form-control @error('bottle_price') is-invalid @enderror" 
+                                   id="bottle_price" 
+                                   name="bottle_price" 
+                                   value="{{ old('bottle_price', $price->bottle_price) }}"
+                                   placeholder="0.00"
+                                   style="border-radius: 12px; padding: 12px 14px;">
+                            @error('bottle_price')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">الأسعار حسب الأحجام المقسمة</h5>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead class="table-light">

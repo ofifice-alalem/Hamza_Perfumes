@@ -17,7 +17,7 @@ class PerfumePriceController extends Controller
 
     public function create()
     {
-        $perfumes = Perfume::all();
+        $perfumes = Perfume::whereNull('category_id')->get();
         $sizes = Size::all();
         return view('prices.create', compact('perfumes', 'sizes'));
     }
@@ -26,6 +26,8 @@ class PerfumePriceController extends Controller
     {
         $request->validate([
             'perfume_id' => 'required|exists:perfumes,id',
+            'bottle_size' => 'nullable|string|max:255',
+            'bottle_price' => 'nullable|numeric|min:0',
             'sizes' => 'required|array',
             'sizes.*.price_regular' => 'nullable|numeric|min:0',
             'sizes.*.price_vip' => 'nullable|numeric|min:0'
@@ -43,6 +45,8 @@ class PerfumePriceController extends Controller
                     PerfumePrice::create([
                         'perfume_id' => $request->perfume_id,
                         'size_id' => $sizeId,
+                        'bottle_size' => $request->bottle_size,
+                        'bottle_price' => $request->bottle_price,
                         'price_regular' => $prices['price_regular'],
                         'price_vip' => $prices['price_vip']
                     ]);
@@ -69,6 +73,8 @@ class PerfumePriceController extends Controller
     {
         $request->validate([
             'perfume_id' => 'required|exists:perfumes,id',
+            'bottle_size' => 'nullable|string|max:255',
+            'bottle_price' => 'nullable|numeric|min:0',
             'sizes' => 'required|array',
             'sizes.*.price_regular' => 'nullable|numeric|min:0',
             'sizes.*.price_vip' => 'nullable|numeric|min:0'
@@ -80,6 +86,8 @@ class PerfumePriceController extends Controller
                 if (isset($priceData['price_id'])) {
                     // تحديث سعر موجود
                     PerfumePrice::where('id', $priceData['price_id'])->update([
+                        'bottle_size' => $request->bottle_size,
+                        'bottle_price' => $request->bottle_price,
                         'price_regular' => $priceData['price_regular'],
                         'price_vip' => $priceData['price_vip']
                     ]);
@@ -88,6 +96,8 @@ class PerfumePriceController extends Controller
                     PerfumePrice::create([
                         'perfume_id' => $request->perfume_id,
                         'size_id' => $sizeId,
+                        'bottle_size' => $request->bottle_size,
+                        'bottle_price' => $request->bottle_price,
                         'price_regular' => $priceData['price_regular'],
                         'price_vip' => $priceData['price_vip']
                     ]);

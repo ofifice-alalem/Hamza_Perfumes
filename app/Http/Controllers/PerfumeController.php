@@ -51,4 +51,60 @@ class PerfumeController extends Controller
         $perfume->delete();
         return redirect()->route('perfumes.index')->with('success', 'تم حذف العطر بنجاح');
     }
+
+    public function checkUnique(Request $request)
+    {
+        $name = trim((string) $request->get('name'));
+        if ($name === '') {
+            return response()->json(['exists' => false]);
+        }
+        $exists = Perfume::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->exists();
+        return response()->json(['exists' => $exists]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = trim((string) $request->get('q'));
+        if ($query === '') {
+            return response()->json(['results' => []]);
+        }
+        
+        $perfumes = Perfume::with('category')
+            ->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($query) . '%'])
+            ->limit(10)
+            ->get()
+            ->map(function ($perfume) {
+                return [
+                    'id' => $perfume->id,
+                    'name' => $perfume->name,
+                    'category' => $perfume->category ? $perfume->category->name : 'غير محدد',
+                    'url' => route('sales.index') . '?perfume_id=' . $perfume->id
+                ];
+            });
+            
+        return response()->json(['results' => $perfumes]);
+    }
+
+    public function searchUncategorized(Request $request)
+    {
+        $query = trim((string) $request->get('q'));
+        if ($query === '') {
+            return response()->json(['results' => []]);
+        }
+        
+        $perfumes = Perfume::whereNull('category_id')
+            ->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($query) . '%'])
+            ->limit(10)
+            ->get()
+            ->map(function ($perfume) {
+                return [
+                    'id' => $perfume->id,
+                    'name' => $perfume->name,
+                    'category' => 'غير مصنف',
+                    'url' => route('sales.index') . '?perfume_id=' . $perfume->id
+                ];
+            });
+            
+        return response()->json(['results' => $perfumes]);
+    }
 }
