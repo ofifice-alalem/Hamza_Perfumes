@@ -11,9 +11,7 @@ Route::get('/', function () {
     return view('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
 Route::get('/perfumes/check-unique', [PerfumeController::class, 'checkUnique'])->name('perfumes.checkUnique');
 Route::get('/perfumes/search', [PerfumeController::class, 'search'])->name('perfumes.search');
@@ -29,3 +27,5 @@ Route::post('sales', [SaleController::class, 'store'])->name('sales.store');
 Route::get('api/get-price', [SaleController::class, 'getPrice']);
 Route::get('api/get-perfume-prices/{perfume}', [PerfumePriceController::class, 'getPerfumePrices']);
 Route::get('api/get-available-sizes/{perfume}', [SaleController::class, 'getAvailableSizes']);
+Route::get('api/sales-analytics', [App\Http\Controllers\DashboardController::class, 'getSalesAnalytics']);
+Route::get('api/export-sales-analytics', [App\Http\Controllers\DashboardController::class, 'exportSalesAnalytics']);
