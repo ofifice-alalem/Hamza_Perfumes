@@ -27,3 +27,4 @@ Route::get('sales', [SaleController::class, 'index'])->name('sales.index');
 Route::post('sales', [SaleController::class, 'store'])->name('sales.store');
 Route::get('api/get-price', [SaleController::class, 'getPrice']);
 Route::get('api/get-perfume-prices/{perfume}', [PerfumePriceController::class, 'getPerfumePrices']);
+Route::get('api/get-available-sizes/{perfume}', [SaleController::class, 'getAvailableSizes']);

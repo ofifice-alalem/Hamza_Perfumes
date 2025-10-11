@@ -13,6 +13,16 @@ class Size extends Model
     {
         return $this->hasMany(PerfumePrice::class);
     }
+    
+    public function perfumePrices(): HasMany
+    {
+        return $this->hasMany(PerfumePrice::class);
+    }
+    
+    public function categoryPrices(): HasMany
+    {
+        return $this->hasMany(CategoryPrice::class);
+    }
 
     public function sales(): HasMany
     {

@@ -15,7 +15,7 @@ class SaleController extends Controller
     {
         $perfumes = Perfume::all();
         $sizes = Size::all();
-        $sales = Sale::with(['perfume', 'size'])->latest()->get();
+        $sales = Sale::with(['perfume', 'size'])->whereDate('created_at', today())->latest()->get();
         return view('sales.index', compact('perfumes', 'sizes', 'sales'));
     }
 
@@ -87,5 +87,30 @@ class SaleController extends Controller
         }
 
         return response()->json(['error' => 'السعر غير محدد'], 404);
+    }
+    
+    public function getAvailableSizes($perfumeId)
+    {
+        $perfume = Perfume::find($perfumeId);
+        
+        if (!$perfume) {
+            return response()->json([]);
+        }
+        
+        $sizes = [];
+        
+        // إذا كان العطر مصنف، جلب الأحجام من أسعار التصنيف
+        if ($perfume->category_id) {
+            $sizes = Size::whereHas('categoryPrices', function($query) use ($perfume) {
+                $query->where('category_id', $perfume->category_id);
+            })->get(['id', 'label']);
+        } else {
+            // إذا كان العطر غير مصنف، جلب الأحجام من أسعار العطر
+            $sizes = Size::whereHas('perfumePrices', function($query) use ($perfumeId) {
+                $query->where('perfume_id', $perfumeId);
+            })->get(['id', 'label']);
+        }
+        
+        return response()->json($sizes);
     }
 }

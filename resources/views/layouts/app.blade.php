@@ -28,7 +28,8 @@
         .empty-state i { font-size: 4rem; color: #6c757d; margin-bottom: 20px; }
         .stats-card { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px; padding: 25px; text-align: center; }
         .stats-number { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
-        .stats-label { font-size: 1rem; opacity: 0.9; }
+        .stats-label { font-size: 1rem; opacity: 0.9; margin-bottom: 5px; }
+        .stats-sublabel { font-size: 0.9rem; opacity: 0.8; font-weight: 600; }
     </style>
 </head>
 <body>

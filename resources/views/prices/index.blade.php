@@ -48,13 +48,13 @@
                 <table class="table table-modern mb-0">
                     <thead>
                         <tr>
-                            <th class="border-0 text-center">#</th>
-                            <th class="border-0 text-center">العطر</th>
-                            <th class="border-0 text-center">سعر العبوة</th>
-                            <th class="border-0 text-center">30 مل</th>
-                            <th class="border-0 text-center">50 مل</th>
-                            <th class="border-0 text-center">100 مل</th>
-                            <th class="border-0 text-center">الإجراءات</th>
+                            <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">#</th>
+                            <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">العطر</th>
+                            <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">سعر العبوة</th>
+                            @foreach($sizes as $size)
+                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">{{ $size->label }}</th>
+                            @endforeach
+                            <th class="border-0 text-center" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -68,57 +68,69 @@
                             $bottleSize = $perfumePrices->first()->bottle_size;
                         @endphp
                         <tr>
-                            <td class="fw-bold text-center">{{ $perfume->id }}</td>
-                            <td class="text-center">
-                                <span class="fw-semibold">
-                                    {{ $perfume->name }}
-                                    @if($bottleSize)
-                                        <span class="text-muted">{{ $bottleSize }}</span>
-                                    @endif
+                            <td class="fw-bold" style="padding: 20px 15px; font-size: 0.95rem; text-align: center;">{{ $perfume->id }}</td>
+                            <td style="padding: 20px 15px; text-align: center;">
+                                <span class="badge px-3 py-2 fw-semibold" style="border-radius: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;">
+                                    <i class="fas fa-spray-can me-1"></i>{{ $perfume->name }}
                                 </span>
+                                @if($bottleSize)
+                                    <div class="mt-1"><small class="text-muted">{{ $bottleSize }}</small></div>
+                                @endif
                             </td>
-                            <td class="text-center">
-                                @if($bottlePrice)
-                                    <div class="fw-bold text-primary">
-                                        <i class="fas fa-wine-bottle me-1"></i>{{ number_format($bottlePrice, 2) }} ريال
-                                    </div>
+                            <td style="padding: 20px 15px; text-align: center;">
+                                @php
+                                    $bottlePriceRegular = $perfumePrices->first()->bottle_price_regular;
+                                    $bottlePriceVip = $perfumePrices->first()->bottle_price_vip;
+                                @endphp
+                                @if($bottlePriceRegular || $bottlePriceVip)
+                                    @if($bottlePriceRegular)
+                                        <div class="mb-1">
+                                            <span class="badge px-2 py-1" style="border-radius: 10px; background:#e8f5e8; color:#28a745; font-weight:600; font-size:0.8rem;">
+                                                عادي: {{ number_format($bottlePriceRegular, 2) }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                    @if($bottlePriceVip)
+                                        <div>
+                                            <span class="badge px-2 py-1" style="border-radius: 10px; background:#fff3cd; color:#856404; font-weight:600; font-size:0.8rem;">
+                                                VIP: {{ number_format($bottlePriceVip, 2) }}
+                                            </span>
+                                        </div>
+                                    @endif
                                 @else
                                     <span class="text-muted">غير محدد</span>
                                 @endif
                             </td>
-                            @foreach(['30', '50', '100'] as $size)
+                            @foreach($sizes as $size)
                                 @php
-                                    $sizePrice = $perfumePrices->where('size.label', $size . ' مل')->first();
+                                    $sizePrice = $perfumePrices->where('size_id', $size->id)->first();
                                 @endphp
-                                <td class="text-center">
+                                <td style="padding: 20px 15px; text-align: center;">
                                     @if($sizePrice)
                                         <div class="mb-1">
-                                            <span class="fw-bold text-success">
-                                                <i class="fas fa-dollar-sign me-1"></i>{{ number_format($sizePrice->price_regular, 2) }}
+                                            <span class="badge px-2 py-1" style="border-radius: 10px; background:#e8f5e8; color:#28a745; font-weight:600; font-size:0.8rem;">
+                                                عادي: {{ number_format($sizePrice->price_regular, 2) }}
                                             </span>
                                         </div>
                                         <div>
-                                            <span class="fw-bold text-warning">
-                                                <i class="fas fa-crown me-1"></i>{{ number_format($sizePrice->price_vip, 2) }}
+                                            <span class="badge px-2 py-1" style="border-radius: 10px; background:#fff3cd; color:#856404; font-weight:600; font-size:0.8rem;">
+                                                VIP: {{ number_format($sizePrice->price_vip, 2) }}
                                             </span>
                                         </div>
                                     @else
-                                        <span class="text-muted">-</span>
+                                        <span class="text-muted">لا يوجد سعر</span>
                                     @endif
                                 </td>
                             @endforeach
-                            <td class="text-center">
+                            <td class="text-center" style="padding: 20px 15px; text-align: center;">
                                 <div class="d-flex gap-2 justify-content-center">
                                     <a href="{{ route('prices.edit', $perfumePrices->first()) }}" class="btn btn-sm btn-warning d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('prices.destroy', $perfumePrices->first()) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="return confirm('هل أنت متأكد من حذف هذا السعر؟')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" 
+                                            data-bs-toggle="modal" data-bs-target="#deletePriceModal{{ $perfume->id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -128,6 +140,45 @@
             </div>
         </div>
     </div>
+    @foreach($groupedPrices as $perfumeId => $perfumePrices)
+    @php
+        $perfume = $perfumePrices->first()->perfume;
+    @endphp
+    <div class="modal fade" id="deletePriceModal{{ $perfume->id }}" tabindex="-1" aria-labelledby="deletePriceModalLabel{{ $perfume->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <div class="modal-header" style="border-bottom: none; padding: 24px 24px 0;">
+                    <h5 class="modal-title fw-bold" id="deletePriceModalLabel{{ $perfume->id }}">تأكيد حذف الأسعار</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 16px 24px 24px;">
+                    <div class="alert alert-warning d-flex align-items-center" style="border-radius: 12px; border: none;">
+                        <i class="fas fa-info-circle me-3"></i>
+                        <div>
+                            سيتم حذف جميع أسعار العطر "<strong>{{ $perfume->name }}</strong>" نهائياً.
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: none; padding: 0 24px 24px;">
+                    <div class="d-flex gap-3 w-100">
+                        <button type="button" class="btn btn-secondary btn-modern flex-fill d-inline-flex align-items-center justify-content-center" data-bs-dismiss="modal" style="border-radius: 12px; padding: 12px; gap: 8px;">
+                            <i class="fas fa-times"></i>
+                            <span>إلغاء</span>
+                        </button>
+                        <form action="{{ route('prices.destroy', $perfumePrices->first()) }}" method="POST" class="flex-fill">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-modern w-100 d-inline-flex align-items-center justify-content-center" style="border-radius: 12px; padding: 12px; gap: 8px;">
+                                <i class="fas fa-trash"></i>
+                                <span>حذف نهائياً</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 @else
     <div class="empty-state">
         <i class="fas fa-dollar-sign"></i>
@@ -135,8 +186,17 @@
         <p class="text-muted mb-4">ابدأ بتعيين أسعار للعطور المختلفة</p>
     </div>
 @endif
-
 <style>
+/* Lightly increase row spacing and font size for this table */
+.table-modern tbody td {
+    padding: 22px 18px; /* more space between rows */
+    font-size: 0.95rem; /* slightly larger text */
+    line-height: 1.5;
+}
+.table-modern thead th {
+    font-size: 0.95rem;
+}
+
 /* Table Row Styling */
 .table-modern tbody tr {
     background-color: #ffffff;

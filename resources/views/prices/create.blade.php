@@ -18,27 +18,30 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="perfume_search" class="form-label fw-semibold">العطر</label>
+                        <label for="perfume_search" class="form-label fw-semibold">العطر (العطور غير المصنفة فقط)</label>
                         <div class="search-container position-relative">
                             <input type="text" 
                                    class="form-control @error('perfume_id') is-invalid @enderror" 
                                    id="perfume_search" 
                                    name="perfume_search"
-                                   placeholder="ابحث عن العطر..."
+                                   placeholder="ابحث عن العطر غير المصنف..."
                                    value="{{ old('perfume_search') }}"
-                                   style="border-radius: 12px; padding: 12px 45px 12px 20px; border: 2px solid #e9ecef; transition: all 0.3s;">
+                                   style="border-radius: 12px; padding: 12px 45px 12px 20px; border: 2px solid #e9ecef; transition: all 0.3s;"
+                                   autocomplete="off">
                             <i class="fas fa-search search-icon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
-                            <input type="hidden" id="perfume_id" name="perfume_id" value="{{ old('perfume_id') }}">
+                            <input type="hidden" id="perfume_id" name="perfume_id" value="{{ old('perfume_id') }}" required>
                             <div id="perfume_dropdown" class="search-dropdown" style="display: none;"></div>
                             @error('perfume_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <small class="text-muted">يمكن إضافة أسعار للعطور غير المصنفة فقط. العطور المصنفة لها أسعار ثابتة.</small>
                     </div>
 
                     <!-- معلومات العبوة الكاملة -->
+                    <h5 class="mb-4 fw-bold">معلومات العبوة الكاملة</h5>
                     <div class="row mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="bottle_size" class="form-label fw-semibold">حجم العبوة الكاملة</label>
                             <input type="text" 
                                    class="form-control @error('bottle_size') is-invalid @enderror" 
@@ -51,16 +54,29 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-6">
-                            <label for="bottle_price" class="form-label fw-semibold">سعر العبوة (ريال)</label>
+                        <div class="col-md-4">
+                            <label for="bottle_price_regular" class="form-label fw-semibold">سعر العبوة - عادي (ريال)</label>
                             <input type="number" step="0.01" 
-                                   class="form-control @error('bottle_price') is-invalid @enderror" 
-                                   id="bottle_price" 
-                                   name="bottle_price" 
-                                   value="{{ old('bottle_price') }}"
+                                   class="form-control @error('bottle_price_regular') is-invalid @enderror" 
+                                   id="bottle_price_regular" 
+                                   name="bottle_price_regular" 
+                                   value="{{ old('bottle_price_regular') }}"
                                    placeholder="0.00"
                                    style="border-radius: 12px; padding: 12px 14px;">
-                            @error('bottle_price')
+                            @error('bottle_price_regular')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-4">
+                            <label for="bottle_price_vip" class="form-label fw-semibold">سعر العبوة - VIP (ريال)</label>
+                            <input type="number" step="0.01" 
+                                   class="form-control @error('bottle_price_vip') is-invalid @enderror" 
+                                   id="bottle_price_vip" 
+                                   name="bottle_price_vip" 
+                                   value="{{ old('bottle_price_vip') }}"
+                                   placeholder="0.00"
+                                   style="border-radius: 12px; padding: 12px 14px;">
+                            @error('bottle_price_vip')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -254,10 +270,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const response = await fetch(`{{ route('perfumes.searchUncategorized') }}?q=${encodeURIComponent(query)}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             const data = await response.json();
-            displayResults(data.results);
+            displayResults(data.results || []);
         } catch (error) {
             console.error('Search error:', error);
+            displayResults([]);
         }
     }
     
@@ -288,8 +308,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Set the selected perfume
                     searchInput.value = perfumeName;
+                    searchInput.dataset.selectedName = perfumeName;
                     perfumeIdInput.value = perfumeId;
                     dropdown.style.display = 'none';
+                    
+                    // Remove any previous error styling
+                    searchInput.classList.remove('is-invalid');
                     
                     // Load existing prices for this perfume
                     loadPerfumePrices(perfumeId);
@@ -303,28 +327,46 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadPerfumePrices(perfumeId) {
         if (perfumeId) {
             fetch(`/api/get-perfume-prices/${perfumeId}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if (data.length > 0) {
+                    if (data && data.length > 0) {
                         // Load bottle information from first record
                         const firstPrice = data[0];
-                        document.getElementById('bottle_size').value = firstPrice.bottle_size || '';
-                        document.getElementById('bottle_price').value = firstPrice.bottle_price || '';
+                        const bottleSizeInput = document.getElementById('bottle_size');
+                        const bottlePriceRegularInput = document.getElementById('bottle_price_regular');
+                        const bottlePriceVipInput = document.getElementById('bottle_price_vip');
+                        
+                        if (bottleSizeInput) bottleSizeInput.value = firstPrice.bottle_size || '';
+                        if (bottlePriceRegularInput) bottlePriceRegularInput.value = firstPrice.bottle_price_regular || '';
+                        if (bottlePriceVipInput) bottlePriceVipInput.value = firstPrice.bottle_price_vip || '';
                         
                         // Load size prices
                         data.forEach(price => {
                             const regularInput = document.querySelector(`input[name="sizes[${price.size_id}][price_regular]"]`);
                             const vipInput = document.querySelector(`input[name="sizes[${price.size_id}][price_vip]"]`);
-                            if (regularInput) regularInput.value = price.price_regular;
-                            if (vipInput) vipInput.value = price.price_vip;
+                            if (regularInput) regularInput.value = price.price_regular || '';
+                            if (vipInput) vipInput.value = price.price_vip || '';
                         });
                     }
                 })
-                .catch(() => {});
+                .catch(error => {
+                    console.error('Error loading perfume prices:', error);
+                });
         } else {
             // Clear all inputs
-            document.getElementById('bottle_size').value = '';
-            document.getElementById('bottle_price').value = '';
+            const bottleSizeInput = document.getElementById('bottle_size');
+            const bottlePriceRegularInput = document.getElementById('bottle_price_regular');
+            const bottlePriceVipInput = document.getElementById('bottle_price_vip');
+            
+            if (bottleSizeInput) bottleSizeInput.value = '';
+            if (bottlePriceRegularInput) bottlePriceRegularInput.value = '';
+            if (bottlePriceVipInput) bottlePriceVipInput.value = '';
+            
             document.querySelectorAll('input[name*="[price_regular]"], input[name*="[price_vip]"]').forEach(input => {
                 input.value = '';
             });
@@ -335,6 +377,12 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         const query = this.value.trim();
+        
+        // Clear perfume ID if search input changes
+        if (perfumeIdInput.value && this.value !== this.dataset.selectedName) {
+            perfumeIdInput.value = '';
+            delete this.dataset.selectedName;
+        }
         
         if (query.length >= 2) {
             searchTimeout = setTimeout(() => performSearch(query), 300);
@@ -361,6 +409,48 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load initial data if perfume is already selected
     if (perfumeIdInput.value) {
         loadPerfumePrices(perfumeIdInput.value);
+    }
+    
+    // Form validation before submit
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const perfumeId = perfumeIdInput.value;
+            const searchValue = searchInput.value.trim();
+            
+            if (!perfumeId || !searchValue) {
+                e.preventDefault();
+                searchInput.classList.add('is-invalid');
+                
+                // Show error message
+                let errorDiv = searchInput.parentNode.querySelector('.invalid-feedback');
+                if (!errorDiv) {
+                    errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback';
+                    searchInput.parentNode.appendChild(errorDiv);
+                }
+                errorDiv.textContent = 'يجب اختيار عطر من القائمة';
+                
+                searchInput.focus();
+                return false;
+            }
+            
+            // Check if at least one price is filled
+            const priceInputs = form.querySelectorAll('input[name*="[price_regular]"], input[name*="[price_vip]"]');
+            let hasPrice = false;
+            
+            priceInputs.forEach(input => {
+                if (input.value && parseFloat(input.value) > 0) {
+                    hasPrice = true;
+                }
+            });
+            
+            if (!hasPrice) {
+                e.preventDefault();
+                alert('يجب إدخال سعر واحد على الأقل');
+                return false;
+            }
+        });
     }
 });
 </script>

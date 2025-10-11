@@ -12,7 +12,8 @@ class PerfumePriceController extends Controller
     public function index()
     {
         $prices = PerfumePrice::with(['perfume', 'size'])->get();
-        return view('prices.index', compact('prices'));
+        $sizes = Size::all();
+        return view('prices.index', compact('prices', 'sizes'));
     }
 
     public function create()
@@ -27,11 +28,18 @@ class PerfumePriceController extends Controller
         $request->validate([
             'perfume_id' => 'required|exists:perfumes,id',
             'bottle_size' => 'nullable|string|max:255',
-            'bottle_price' => 'nullable|numeric|min:0',
+            'bottle_price_regular' => 'nullable|numeric|min:0',
+            'bottle_price_vip' => 'nullable|numeric|min:0',
             'sizes' => 'required|array',
             'sizes.*.price_regular' => 'nullable|numeric|min:0',
             'sizes.*.price_vip' => 'nullable|numeric|min:0'
         ]);
+
+        // التحقق من أن العطر غير مصنف
+        $perfume = Perfume::find($request->perfume_id);
+        if ($perfume && $perfume->category_id !== null) {
+            return back()->withErrors(['perfume_id' => 'لا يمكن إضافة أسعار للعطور المصنفة. العطور المصنفة لها أسعار ثابتة.'])->withInput();
+        }
 
         $savedCount = 0;
         foreach ($request->sizes as $sizeId => $prices) {
@@ -46,7 +54,8 @@ class PerfumePriceController extends Controller
                         'perfume_id' => $request->perfume_id,
                         'size_id' => $sizeId,
                         'bottle_size' => $request->bottle_size,
-                        'bottle_price' => $request->bottle_price,
+                        'bottle_price_regular' => $request->bottle_price_regular,
+                        'bottle_price_vip' => $request->bottle_price_vip,
                         'price_regular' => $prices['price_regular'],
                         'price_vip' => $prices['price_vip']
                     ]);
@@ -74,7 +83,8 @@ class PerfumePriceController extends Controller
         $request->validate([
             'perfume_id' => 'required|exists:perfumes,id',
             'bottle_size' => 'nullable|string|max:255',
-            'bottle_price' => 'nullable|numeric|min:0',
+            'bottle_price_regular' => 'nullable|numeric|min:0',
+            'bottle_price_vip' => 'nullable|numeric|min:0',
             'sizes' => 'required|array',
             'sizes.*.price_regular' => 'nullable|numeric|min:0',
             'sizes.*.price_vip' => 'nullable|numeric|min:0'
@@ -87,7 +97,8 @@ class PerfumePriceController extends Controller
                     // تحديث سعر موجود
                     PerfumePrice::where('id', $priceData['price_id'])->update([
                         'bottle_size' => $request->bottle_size,
-                        'bottle_price' => $request->bottle_price,
+                        'bottle_price_regular' => $request->bottle_price_regular,
+                        'bottle_price_vip' => $request->bottle_price_vip,
                         'price_regular' => $priceData['price_regular'],
                         'price_vip' => $priceData['price_vip']
                     ]);
@@ -97,7 +108,8 @@ class PerfumePriceController extends Controller
                         'perfume_id' => $request->perfume_id,
                         'size_id' => $sizeId,
                         'bottle_size' => $request->bottle_size,
-                        'bottle_price' => $request->bottle_price,
+                        'bottle_price_regular' => $request->bottle_price_regular,
+                        'bottle_price_vip' => $request->bottle_price_vip,
                         'price_regular' => $priceData['price_regular'],
                         'price_vip' => $priceData['price_vip']
                     ]);
