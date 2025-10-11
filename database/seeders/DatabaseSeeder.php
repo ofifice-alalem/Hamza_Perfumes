@@ -2,59 +2,132 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\Category;
-use App\Models\CategoryPrice;
 use App\Models\Perfume;
 use App\Models\Size;
-use Illuminate\Database\Seeder;
+use App\Models\PerfumePrice;
+use App\Models\Sale;
 
 class DatabaseSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
+        // مسح البيانات الموجودة
+        Sale::query()->delete();
+        PerfumePrice::query()->delete();
+        \App\Models\CategoryPrice::query()->delete();
+        Perfume::query()->delete();
+        Category::query()->delete();
+        Size::query()->delete();
+
         // إنشاء الأحجام
-        $sizes = ['3ml', '8ml', '15ml', '30ml', '50ml'];
-        foreach ($sizes as $sizeLabel) {
-            Size::create(['label' => $sizeLabel]);
+        $sizes = [
+            ['label' => '10مل'],
+            ['label' => '20مل'],
+            ['label' => '30مل'],
+            ['label' => '50مل'],
+            ['label' => '100مل'],
+        ];
+
+        foreach ($sizes as $size) {
+            Size::create($size);
         }
 
         // إنشاء التصنيفات
-        $categories = [
-            'A' => [['3ml' => 5, '8ml' => 10, '15ml' => 18, '30ml' => 35, '50ml' => 55], ['3ml' => 4, '8ml' => 8, '15ml' => 15, '30ml' => 28, '50ml' => 45]],
-            'B' => [['3ml' => 8, '8ml' => 15, '15ml' => 25, '30ml' => 45, '50ml' => 70], ['3ml' => 6, '8ml' => 12, '15ml' => 20, '30ml' => 36, '50ml' => 56]],
-            'C' => [['3ml' => 12, '8ml' => 22, '15ml' => 35, '30ml' => 60, '50ml' => 90], ['3ml' => 10, '8ml' => 18, '15ml' => 28, '30ml' => 48, '50ml' => 72]]
-        ];
+        $categories = ['A', 'B', 'C', 'غير مصنف'];
 
-        foreach ($categories as $categoryName => [$regularPrices, $vipPrices]) {
-            $category = Category::create(['name' => $categoryName]);
-            
-            foreach ($regularPrices as $sizeLabel => $regularPrice) {
-                $size = Size::where('label', $sizeLabel)->first();
-                CategoryPrice::create([
-                    'category_id' => $category->id,
-                    'size_id' => $size->id,
-                    'price_regular' => $regularPrice,
-                    'price_vip' => $vipPrices[$sizeLabel]
+        foreach ($categories as $categoryName) {
+            Category::create(['name' => $categoryName]);
+        }
+
+        $categoryIds = Category::pluck('id')->toArray();
+        $sizeIds = Size::pluck('id')->toArray();
+
+        // إضافة أسعار للتصنيفات
+        foreach ($categoryIds as $categoryId) {
+            foreach ($sizeIds as $sizeId) {
+                \App\Models\CategoryPrice::create([
+                    'category_id' => $categoryId,
+                    'size_id' => $sizeId,
+                    'price_regular' => rand(15, 120),
+                    'price_vip' => rand(12, 100)
                 ]);
             }
         }
 
-        // إنشاء عطور تجريبية
-        $perfumesData = [
-            ['عود كمبودي', 'A'],
-            ['عنبر أسود', 'A'],
-            ['ورد طائفي', 'B'],
-            ['مسك أبيض', 'B'],
-            ['عود هندي', 'C'],
-            ['عنبر ملكي', 'C'],
-            ['عطر خاص', null] // عطر بدون تصنيف
-        ];
+        // إنشاء 500 عطر مع تصنيفات
+        for ($i = 1; $i <= 500; $i++) {
+            $perfume = Perfume::create([
+                'name' => 'عطر ' . $i,
+                'category_id' => $categoryIds[array_rand($categoryIds)]
+            ]);
 
-        foreach ($perfumesData as [$perfumeName, $categoryName]) {
-            $categoryId = $categoryName ? Category::where('name', $categoryName)->first()->id : null;
-            Perfume::create([
-                'name' => $perfumeName,
-                'category_id' => $categoryId
+            // إضافة أسعار للعطر
+            foreach ($sizeIds as $sizeId) {
+                PerfumePrice::create([
+                    'perfume_id' => $perfume->id,
+                    'size_id' => $sizeId,
+                    'price_regular' => rand(10, 100),
+                    'price_vip' => rand(8, 80),
+                    'bottle_price_regular' => rand(50, 200),
+                    'bottle_price_vip' => rand(40, 160)
+                ]);
+            }
+        }
+
+        // إنشاء 30 عطر بدون تصنيف
+        for ($i = 501; $i <= 530; $i++) {
+            $perfume = Perfume::create([
+                'name' => 'عطر غير مصنف ' . ($i - 500),
+                'category_id' => null
+            ]);
+
+            // إضافة أسعار للعطر
+            foreach ($sizeIds as $sizeId) {
+                PerfumePrice::create([
+                    'perfume_id' => $perfume->id,
+                    'size_id' => $sizeId,
+                    'price_regular' => rand(10, 100),
+                    'price_vip' => rand(8, 80),
+                    'bottle_price_regular' => rand(50, 200),
+                    'bottle_price_vip' => rand(40, 160)
+                ]);
+            }
+        }
+
+        // إنشاء 1000+ مبيعة
+        $perfumeIds = Perfume::pluck('id')->toArray();
+        $customerTypes = ['regular', 'vip'];
+
+        for ($i = 1; $i <= 1200; $i++) {
+            $perfumeId = $perfumeIds[array_rand($perfumeIds)];
+            $sizeId = $sizeIds[array_rand($sizeIds)];
+            $customerType = $customerTypes[array_rand($customerTypes)];
+            $isFullBottle = rand(0, 1);
+
+            // الحصول على السعر المناسب
+            $priceRecord = PerfumePrice::where('perfume_id', $perfumeId)
+                ->where('size_id', $sizeId)
+                ->first();
+
+            if ($priceRecord) {
+                if ($isFullBottle) {
+                    $price = $customerType === 'vip' ? $priceRecord->bottle_price_vip : $priceRecord->bottle_price_regular;
+                } else {
+                    $price = $customerType === 'vip' ? $priceRecord->price_vip : $priceRecord->price_regular;
+                }
+            } else {
+                $price = rand(10, 100);
+            }
+
+            Sale::create([
+                'perfume_id' => $perfumeId,
+                'size_id' => $sizeId,
+                'customer_type' => $customerType,
+                'price' => $price,
+                'is_full_bottle' => $isFullBottle,
+                'created_at' => now()->subDays(rand(0, 365))
             ]);
         }
     }

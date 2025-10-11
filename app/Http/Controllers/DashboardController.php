@@ -22,13 +22,13 @@ class DashboardController extends Controller
     
     public function getSalesAnalytics(Request $request)
     {
-        $data = $this->getSalesData($request);
+        $data = $this->getSalesData($request, true);
         return response()->json($data);
     }
     
     public function exportSalesAnalytics(Request $request)
     {
-        $data = $this->getSalesData($request);
+        $data = $this->getSalesData($request, false);
         $filters = $request->only(['date_from', 'date_to', 'customer_type', 'sort_by']);
         $format = $request->get('format', 'csv');
         
@@ -44,7 +44,7 @@ class DashboardController extends Controller
         }
     }
     
-    private function getSalesData(Request $request)
+    private function getSalesData(Request $request, $paginate = false)
     {
         $query = Sale::with(['perfume.category', 'size']);
         
@@ -98,9 +98,19 @@ class DashboardController extends Controller
         $sortBy = $request->sort_by ?? 'sales_count';
         $perfumeStats = $perfumeStats->sortByDesc($sortBy)->values();
         
+        $totalCount = $perfumeStats->count();
+        
+        if ($paginate) {
+            $page = $request->get('page', 1);
+            $perPage = 50;
+            $offset = ($page - 1) * $perPage;
+            $perfumeStats = $perfumeStats->slice($offset, $perPage)->values();
+        }
+        
         return [
             'stats' => $stats,
-            'perfumes' => $perfumeStats
+            'perfumes' => $perfumeStats,
+            'total_count' => $totalCount
         ];
     }
     

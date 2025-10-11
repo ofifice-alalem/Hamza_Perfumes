@@ -11,14 +11,25 @@ class PerfumePriceController extends Controller
 {
     public function index()
     {
-        $prices = PerfumePrice::with(['perfume', 'size'])->get();
+        $prices = PerfumePrice::with(['perfume', 'size'])
+            ->whereHas('perfume', function($query) {
+                $query->whereNull('category_id')
+                      ->orWhereHas('category', function($q) {
+                          $q->where('name', 'غير مصنف');
+                      });
+            })
+            ->get();
         $sizes = Size::all();
         return view('prices.index', compact('prices', 'sizes'));
     }
 
     public function create()
     {
-        $perfumes = Perfume::whereNull('category_id')->get();
+        $perfumes = Perfume::whereNull('category_id')
+            ->orWhereHas('category', function($query) {
+                $query->where('name', 'غير مصنف');
+            })
+            ->get();
         $sizes = Size::all();
         return view('prices.create', compact('perfumes', 'sizes'));
     }
@@ -35,9 +46,9 @@ class PerfumePriceController extends Controller
             'sizes.*.price_vip' => 'nullable|numeric|min:0'
         ]);
 
-        // التحقق من أن العطر غير مصنف
-        $perfume = Perfume::find($request->perfume_id);
-        if ($perfume && $perfume->category_id !== null) {
+        // التحقق من أن العطر غير مصنف أو تحت تصنيف "غير مصنف"
+        $perfume = Perfume::with('category')->find($request->perfume_id);
+        if ($perfume && $perfume->category_id !== null && $perfume->category->name !== 'غير مصنف') {
             return back()->withErrors(['perfume_id' => 'لا يمكن إضافة أسعار للعطور المصنفة. العطور المصنفة لها أسعار ثابتة.'])->withInput();
         }
 

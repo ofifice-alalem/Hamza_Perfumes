@@ -147,13 +147,68 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = `/api/export-sales-analytics?${params}`;
     };
     
+    // إضافة pagination بسيطة
+    let currentPage = 1;
+    window.loadPage = function(page) {
+        currentPage = page;
+        loadSalesData();
+    };
+    
+    function addPagination(totalCount) {
+        const totalPages = Math.ceil(totalCount / 50);
+        let paginationHtml = '';
+        
+        if (totalPages > 1) {
+            paginationHtml = '<div class="pagination-container d-flex justify-content-center my-3"><div class="d-flex gap-2 align-items-center">';
+            
+            // زر الصفحة الأولى
+            const firstDisabled = currentPage === 1;
+            const firstClass = firstDisabled ? 'btn-secondary' : 'btn-outline-primary';
+            paginationHtml += `<button class="btn btn-sm ${firstClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(1)" ${firstDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-right"></i></button>`;
+            
+            // زر السابق
+            const prevDisabled = currentPage === 1;
+            const prevClass = prevDisabled ? 'btn-secondary' : 'btn-primary';
+            paginationHtml += `<button class="btn btn-sm ${prevClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+            
+            // أرقام الصفحات
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === currentPage;
+                const btnClass = isActive ? 'btn-warning' : 'btn-outline-primary';
+                paginationHtml += `<button class="btn btn-sm ${btnClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; font-weight: 600;" onclick="loadPage(${i})">${i}</button>`;
+            }
+            
+            // زر التالي
+            const nextDisabled = currentPage === totalPages;
+            const nextClass = nextDisabled ? 'btn-secondary' : 'btn-primary';
+            paginationHtml += `<button class="btn btn-sm ${nextClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+            
+            // زر الصفحة الأخيرة
+            const lastDisabled = currentPage === totalPages;
+            const lastClass = lastDisabled ? 'btn-secondary' : 'btn-outline-primary';
+            paginationHtml += `<button class="btn btn-sm ${lastClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(${totalPages})" ${lastDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-left"></i></button>`;
+            
+            paginationHtml += '</div></div>';
+        }
+        
+        // إضافة pagination في نهاية الصفحة
+        document.body.insertAdjacentHTML('beforeend', paginationHtml);
+    }
+    
     async function loadSalesData() {
         const formData = new FormData(document.getElementById('salesFilters'));
         const params = new URLSearchParams(formData);
         
         try {
+            params.append('page', currentPage);
             const response = await fetch(`/api/sales-analytics?${params}`);
             const data = await response.json();
+            
+            // إزالة pagination القديم
+            document.querySelectorAll('.pagination-container').forEach(el => el.remove());
             
             // تحديث الإحصائيات
             document.getElementById('totalSales').textContent = data.stats.total_sales.toLocaleString();
@@ -162,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('avgSale').textContent = data.stats.avg_sale.toFixed(2);
             
             // تحديث عداد النتائج
-            document.getElementById('resultsCount').textContent = `${data.perfumes.length} نتيجة`;
+            document.getElementById('resultsCount').textContent = `${data.total_count} نتيجة`;
             
             // تحديث الجدول
             const tbody = document.getElementById('salesTableBody');
@@ -214,6 +269,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </tr>
                 `).join('');
             }
+            
+            // إضافة pagination
+            addPagination(data.total_count);
             
         } catch (error) {
             console.error('Error loading sales data:', error);
@@ -307,6 +365,23 @@ document.addEventListener('DOMContentLoaded', function() {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.pagination .page-link {
+    border: none;
+    margin: 0 2px;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover:not(.active) {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.pagination .page-item.disabled .page-link {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 </style>
 @endsection
