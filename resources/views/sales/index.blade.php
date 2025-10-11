@@ -131,9 +131,21 @@
                                         </span>
                                     </td>
                                     <td style="padding: 20px 15px; text-align: center;">
-                                        <span class="badge px-3 py-2" style="border-radius: 15px; background:#eef2ff; color:#374151; font-weight:600;">
-                                            <i class="fas fa-ruler me-1" style="color:#6366f1;"></i>{{ $sale->size->label }}
-                                        </span>
+                                        @if($sale->size_id && $sale->size)
+                                            @if($sale->is_full_bottle)
+                                                <span class="badge px-3 py-2" style="border-radius: 15px; background:#fff3cd; color:#856404; font-weight:600;">
+                                                    <i class="fas fa-wine-bottle me-1" style="color:#856404;"></i>{{ $sale->size->label }} (عبوة كاملة)
+                                                </span>
+                                            @else
+                                                <span class="badge px-3 py-2" style="border-radius: 15px; background:#eef2ff; color:#374151; font-weight:600;">
+                                                    <i class="fas fa-ruler me-1" style="color:#6366f1;"></i>{{ $sale->size->label }}
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="badge px-3 py-2" style="border-radius: 15px; background:#fff3cd; color:#856404; font-weight:600;">
+                                                <i class="fas fa-wine-bottle me-1" style="color:#856404;"></i>عبوة كاملة
+                                            </span>
+                                        @endif
                                     </td>
                                     <td style="padding: 20px 15px; text-align: center;">
                                         <span class="badge px-3 py-2" style="border-radius: 15px; background:{{ $sale->customer_type === 'vip' ? '#fff3cd' : '#d1ecf1' }}; color:{{ $sale->customer_type === 'vip' ? '#856404' : '#0c5460' }}; font-weight:600;">
@@ -148,7 +160,7 @@
                                     </td>
                                     <td style="padding: 20px 15px; text-align: center;">
                                         <span class="text-muted">
-                                            <i class="fas fa-calendar me-1"></i>{{ $sale->created_at->format('Y-m-d H:i') }}
+                                            {{ $sale->created_at->format('Y-m-d H:i') }}
                                         </span>
                                     </td>
                                 </tr>
@@ -404,6 +416,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     sizeSelect.addEventListener('change', updatePrice);
     customerTypeSelect.addEventListener('change', updatePrice);
+    
+    // تحميل العطر من URL إذا كان موجود
+    const urlParams = new URLSearchParams(window.location.search);
+    const perfumeIdFromUrl = urlParams.get('perfume_id');
+    
+    if (perfumeIdFromUrl && perfumeIdInput.value === perfumeIdFromUrl) {
+        // جلب بيانات العطر وتعبئة الحقل
+        fetch(`{{ route('perfumes.search') }}?q=`)
+            .then(response => response.json())
+            .then(data => {
+                // البحث عن العطر بالID
+                fetch('/api/get-perfume-by-id/' + perfumeIdFromUrl)
+                    .then(response => response.json())
+                    .then(perfume => {
+                        if (perfume) {
+                            perfumeSearchInput.value = perfume.name;
+                            perfumeSearchInput.dataset.selectedName = perfume.name;
+                            perfumeIdInput.value = perfume.id;
+                            loadAvailableSizes(perfume.id);
+                        }
+                    })
+                    .catch(error => console.error('Error loading perfume:', error));
+            })
+            .catch(error => console.error('Error:', error));
+    }
 });
 </script>
 

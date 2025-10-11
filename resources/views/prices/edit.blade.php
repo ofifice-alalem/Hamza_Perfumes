@@ -29,19 +29,23 @@
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <label for="bottle_size" class="form-label fw-semibold">حجم العبوة الكاملة</label>
-                            <input type="text" 
-                                   class="form-control @error('bottle_size') is-invalid @enderror" 
-                                   id="bottle_size" 
-                                   name="bottle_size" 
-                                   value="{{ old('bottle_size', $price->bottle_size) }}"
-                                   placeholder="مثال: 100 مل"
-                                   style="border-radius: 12px; padding: 12px 14px;">
+                            <select class="form-select @error('bottle_size') is-invalid @enderror" 
+                                    id="bottle_size" 
+                                    name="bottle_size" 
+                                    style="border-radius: 12px; padding: 12px 14px;">
+                                <option value="">اختر حجم العبوة</option>
+                                @foreach($sizes as $size)
+                                    <option value="{{ $size->label }}" {{ old('bottle_size', $price->bottle_size) == $size->label ? 'selected' : '' }}>
+                                        {{ $size->label }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('bottle_size')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-4">
-                            <label for="bottle_price_regular" class="form-label fw-semibold">سعر العبوة - عادي (ريال)</label>
+                            <label for="bottle_price_regular" class="form-label fw-semibold">سعر العبوة - عادي (دينار)</label>
                             <input type="number" step="0.01" 
                                    class="form-control @error('bottle_price_regular') is-invalid @enderror" 
                                    id="bottle_price_regular" 
@@ -54,7 +58,7 @@
                             @enderror
                         </div>
                         <div class="col-md-4">
-                            <label for="bottle_price_vip" class="form-label fw-semibold">سعر العبوة - VIP (ريال)</label>
+                            <label for="bottle_price_vip" class="form-label fw-semibold">سعر العبوة - VIP (دينار)</label>
                             <input type="number" step="0.01" 
                                    class="form-control @error('bottle_price_vip') is-invalid @enderror" 
                                    id="bottle_price_vip" 
@@ -74,8 +78,8 @@
                             <thead>
                                 <tr>
                                     <th class="border-0">الحجم</th>
-                                    <th class="border-0">السعر العادي (ريال)</th>
-                                    <th class="border-0">سعر VIP (ريال)</th>
+                                    <th class="border-0">السعر العادي (دينار)</th>
+                                    <th class="border-0">سعر VIP (دينار)</th>
                                 </tr>
                             </thead>
                             <tbody>

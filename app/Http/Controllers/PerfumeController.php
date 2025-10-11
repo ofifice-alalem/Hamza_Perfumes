@@ -107,4 +107,19 @@ class PerfumeController extends Controller
             
         return response()->json(['results' => $perfumes]);
     }
+    
+    public function getPerfumeById($id)
+    {
+        $perfume = Perfume::with('category')->find($id);
+        
+        if (!$perfume) {
+            return response()->json(null, 404);
+        }
+        
+        return response()->json([
+            'id' => $perfume->id,
+            'name' => $perfume->name,
+            'category' => $perfume->category ? $perfume->category->name : 'غير محدد'
+        ]);
+    }
 }

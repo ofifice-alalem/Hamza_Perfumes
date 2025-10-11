@@ -18,6 +18,7 @@ Route::get('/dashboard', function () {
 Route::get('/perfumes/check-unique', [PerfumeController::class, 'checkUnique'])->name('perfumes.checkUnique');
 Route::get('/perfumes/search', [PerfumeController::class, 'search'])->name('perfumes.search');
 Route::get('/perfumes/search-uncategorized', [PerfumeController::class, 'searchUncategorized'])->name('perfumes.searchUncategorized');
+Route::get('/api/get-perfume-by-id/{id}', [PerfumeController::class, 'getPerfumeById']);
 
 Route::resource('perfumes', PerfumeController::class);
 Route::resource('sizes', SizeController::class);
