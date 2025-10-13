@@ -18,6 +18,130 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     @stack('styles')
+    
+    <style>
+    .search-container {
+        position: relative;
+    }
+    .search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        z-index: 50;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 4px;
+    }
+    .dark .search-dropdown {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    .search-dropdown::-webkit-scrollbar {
+        width: 6px;
+    }
+    .search-dropdown::-webkit-scrollbar-track {
+        background: #f3f4f6;
+        border-radius: 3px;
+    }
+    .search-dropdown::-webkit-scrollbar-thumb {
+        background: #9ca3af;
+        border-radius: 3px;
+    }
+    .search-dropdown::-webkit-scrollbar-thumb:hover {
+        background: #6b7280;
+    }
+    .search-result-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f3f4f6;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .dark .search-result-item {
+        border-bottom-color: #4b5563;
+    }
+    .search-result-item:hover {
+        background-color: #f9fafb;
+    }
+    .dark .search-result-item:hover {
+        background-color: #4b5563;
+    }
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+    </style>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const globalSearch = document.getElementById('globalSearch');
+        const globalDropdown = document.getElementById('globalSearchDropdown');
+        let searchTimeout;
+        
+        if (globalSearch && globalDropdown) {
+            globalSearch.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                
+                if (query.length >= 2) {
+                    searchTimeout = setTimeout(() => performGlobalSearch(query), 300);
+                } else {
+                    globalDropdown.classList.add('hidden');
+                }
+            });
+            
+            globalSearch.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    globalDropdown.classList.remove('hidden');
+                }
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!globalSearch.closest('.search-container').contains(e.target)) {
+                    globalDropdown.classList.add('hidden');
+                }
+            });
+        }
+        
+        async function performGlobalSearch(query) {
+            try {
+                const response = await fetch(`/perfumes/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                displayGlobalResults(data.results || []);
+            } catch (error) {
+                console.error('Search error:', error);
+                displayGlobalResults([]);
+            }
+        }
+        
+        function displayGlobalResults(results) {
+            if (results.length === 0) {
+                globalDropdown.innerHTML = `
+                    <div class="p-4 text-center">
+                        <i class="fas fa-search text-gray-400 mb-2" style="font-size: 2rem;"></i>
+                        <div class="text-gray-500 dark:text-gray-400">لا توجد نتائج</div>
+                    </div>
+                `;
+            } else {
+                globalDropdown.innerHTML = results.map(perfume => `
+                    <div class="search-result-item" onclick="window.location.href='/sales?perfume_id=${perfume.id}'">
+                        <div class="font-medium text-gray-900 dark:text-white">${perfume.name}</div>
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            ${perfume.category}
+                        </span>
+                    </div>
+                `).join('');
+            }
+            globalDropdown.classList.remove('hidden');
+        }
+    });
+    </script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-800 font-tajawal transition-colors duration-300">
 
@@ -122,7 +246,7 @@
         <div class="lg:mr-64 min-h-screen transition-all duration-300">
             <!-- Top Bar -->
             <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600">
-                <div class="flex items-center justify-between px-4 lg:px-6 py-4">
+                <div class="flex items-center px-4 lg:px-6 py-4">
                     <div class="flex items-center">
                         <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100 transition-colors">
                             <i class="fas fa-bars text-xl"></i>
@@ -130,10 +254,21 @@
                         <h2 class="text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 mr-2 lg:mr-4">@yield('page-title', 'الصفحة الرئيسية')</h2>
                     </div>
                     
-                    <div class="flex items-center space-x-4 space-x-reverse">
-                        <div class="text-xs lg:text-sm text-gray-500 dark:text-gray-300">
-                            {{ now()->format('Y/m/d') }}
+                    <!-- Search Bar - Center -->
+                    <div class="flex-1 flex justify-center px-4">
+                        <div class="search-container relative w-full max-w-md">
+                            <input type="text" 
+                                   id="globalSearch" 
+                                   placeholder="بحث عن عطر..."
+                                   class="form-input pr-12 w-full" 
+                                   autocomplete="off">
+                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <div id="globalSearchDropdown" class="search-dropdown hidden"></div>
                         </div>
+                    </div>
+                    
+                    <div class="text-xs lg:text-sm text-gray-500 dark:text-gray-300" id="currentDate">
+                        <!-- سيتم تحديثه بـ JavaScript -->
                     </div>
                 </div>
             </div>
@@ -241,6 +376,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing dark mode...');
             initDarkMode();
+            
+            // Update date from client device
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                dateElement.textContent = `${year}/${month}/${day}`;
+            }
         });
 
         // Also try to initialize immediately (in case DOM is already loaded)

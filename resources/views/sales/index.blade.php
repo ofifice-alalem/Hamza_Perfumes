@@ -33,7 +33,7 @@
                                name="perfume_search"
                                placeholder="ابحث عن العطر..."
                                autocomplete="off">
-                        <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                         <input type="hidden" id="perfume_id" name="perfume_id" value="{{ request('perfume_id') }}" required>
                         <div id="perfume_dropdown" class="search-dropdown hidden"></div>
                         @error('perfume_id')
@@ -171,7 +171,7 @@
                                 </span>
                             </td>
                             <td class="text-right text-gray-500 dark:text-gray-400 text-sm">
-                                {{ $sale->created_at->format('Y-m-d H:i') }}
+                                <span class="sale-date" data-date="{{ $sale->created_at->toISOString() }}">{{ $sale->created_at->format('Y-m-d H:i') }}</span>
                             </td>
                         </tr>
                         @endforeach
@@ -459,7 +459,20 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Error:', error));
     }
 });
-</script>
 
+// Convert dates to local timezone
+document.querySelectorAll('.sale-date').forEach(function(element) {
+    const utcDate = element.getAttribute('data-date');
+    if (utcDate) {
+        const localDate = new Date(utcDate);
+        const year = localDate.getFullYear();
+        const month = String(localDate.getMonth() + 1).padStart(2, '0');
+        const day = String(localDate.getDate()).padStart(2, '0');
+        const hours = String(localDate.getHours()).padStart(2, '0');
+        const minutes = String(localDate.getMinutes()).padStart(2, '0');
+        element.textContent = `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+});
+</script>
 
 @endsection
