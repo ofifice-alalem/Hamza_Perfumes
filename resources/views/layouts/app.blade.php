@@ -1,311 +1,341 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'حمزة عطور')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
-    <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #f5f5f5; }
-        .page-container { background-color: #f5f5f5; min-height: 100vh; padding: 0; margin: 0; }
-        .main-content { background: #f5f5f5; border-radius: 0;  padding: 24px; margin: 0; }
-        .offcanvas-header { background: linear-gradient(135deg, #ff6b35, #f7931e); color: white; }
-        .nav-link { color: #495057; transition: all 0.3s; border-radius: 8px; margin: 0; padding: 8px 12px; }
-        .nav-link:hover { color: #ff6b35; background-color: transparent; }
-        .nav-link.active { background: transparent; color: #ff6b35; }
-        .nav-link i { width: 20px; }
-        .table-modern { border-radius: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .table-modern thead { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        .table-modern tbody tr:hover { background-color: #f8f9fa; }
-        .btn-modern { border-radius: 25px; padding: 8px 20px; font-weight: 500; transition: all 0.3s; }
-        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .card-modern { border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: all 0.3s ease; }
-        .card-modern:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .empty-state { text-align: center; padding: 60px 20px; }
-        .empty-state i { font-size: 4rem; color: #6c757d; margin-bottom: 20px; }
-        .stats-card { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px; padding: 25px; text-align: center; }
-        .stats-number { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
-        .stats-label { font-size: 1rem; opacity: 0.9; margin-bottom: 5px; }
-        .stats-sublabel { font-size: 0.9rem; opacity: 0.8; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="page-container">
-        <!-- Header like dashboard (full width, no extra spacing) -->
-        <header class="w-100" style="border-bottom: 2px solid #e9ecef;">
-            <div class="d-flex align-items-center justify-content-between" style=" background: transparent; padding: 20px 16px;">
-                <!-- Mobile burger -->
-                <button class="btn btn-outline-primary d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <!-- Center nav links (desktop) - moved to start position -->
-                <nav class="nav-links d-none d-md-flex align-items-center" style="gap: 24px;">
-                    @auth
-                        @if(auth()->user()->isSuperAdmin())
-                            <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">لوحة التحكم</a>
-                            <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">المستخدمين</a>
-                        @endif
-                        
-                        @if(auth()->user()->isSuperAdmin() || auth()->user()->isAdmin())
-                            <a class="nav-link {{ request()->routeIs('perfumes.*') ? 'active' : '' }}" href="{{ route('perfumes.index') }}">العطور</a>
-                            <a class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">التصنيفات</a>
-                            <a class="nav-link {{ request()->routeIs('sizes.*') ? 'active' : '' }}" href="{{ route('sizes.index') }}">الأحجام</a>
-                            <a class="nav-link {{ request()->routeIs('prices.*') ? 'active' : '' }}" href="{{ route('prices.index') }}">الأسعار</a>
-                        @endif
-                        
-                        <a class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">المبيعات</a>
-                    @endauth
-                </nav>
-                <!-- Right actions (desktop) -->
-                <div class="search-section d-none d-md-flex">
-                    <div class="search-box me-3" style="width: 400px;">
-                        <input type="text" class="search-input" placeholder="ابحث عن العطور..." style="width: 100%; border-radius: 25px; padding: 12px 45px 12px 20px; border: 2px solid #e9ecef; transition: all 0.3s;">
-                        <i class="fas fa-search search-icon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
-                    </div>
-                    <div class="header-icons">
-                        @auth
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 25px; padding: 12px 20px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 1rem;">
-                                    <i class="fas fa-user me-2" style="font-size: 0.9rem;"></i>
-                                    {{ auth()->user()->name }}
-                                </button>
-                                <ul class="dropdown-menu" style="border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: none; padding: 8px 0; min-width: 200px;">
-                                    <li>
-                                        <div class="dropdown-item-text px-3 py-2" style="border-bottom: 1px solid #f0f0f0;">
-                                            <div class="fw-bold text-dark">{{ auth()->user()->name }}</div>
-                                            <small class="text-muted">
-                                                @if(auth()->user()->role === 'super-admin')
-                                                    مدير عام
-                                                @elseif(auth()->user()->role === 'admin')
-                                                    مدير
-                                                @else
-                                                    بائع
-                                                @endif
-                                            </small>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <form action="{{ route('logout') }}" method="POST" class="d-inline w-100">
-                                            @csrf
-                                            <button type="submit" class="dropdown-item d-flex align-items-center" style="padding: 12px 20px; border-radius: 10px; margin: 4px 8px; transition: all 0.3s; color: #dc3545;">
-                                                <i class="fas fa-sign-out-alt me-3"></i>تسجيل الخروج
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                        @else
-                            <a href="{{ route('login') }}" class="btn btn-primary">
-                                <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
-                            </a>
-                        @endauth
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Sidebar Offcanvas - mobile only -->
-        <div class="offcanvas offcanvas-end d-md-none" tabindex="-1" id="sidebar">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title d-flex align-items-center">
-                    <div class="logo-icon me-2">T</div>
-                    TWISTY
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-            </div>
-            <div class="offcanvas-body p-0">
-                <nav class="nav flex-column">
-                    @auth
-                        @if(auth()->user()->isSuperAdmin())
-                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                                <i class="fas fa-tachometer-alt me-3"></i>لوحة التحكم
-                            </a>
-                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
-                                <i class="fas fa-users me-3"></i>المستخدمين
-                            </a>
-                        @endif
-                        
-                        @if(auth()->user()->isSuperAdmin() || auth()->user()->isAdmin())
-                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('perfumes.*') ? 'active' : '' }}" href="{{ route('perfumes.index') }}">
-                                <i class="fas fa-spray-can me-3"></i>العطور
-                            </a>
-                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
-                                <i class="fas fa-tags me-3"></i>التصنيفات
-                            </a>
-                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('sizes.*') ? 'active' : '' }}" href="{{ route('sizes.index') }}">
-                                <i class="fas fa-ruler me-3"></i>الأحجام
-                            </a>
-                            <a class="nav-link py-3 px-4 border-bottom {{ request()->routeIs('prices.*') ? 'active' : '' }}" href="{{ route('prices.index') }}">
-                                <i class="fas fa-dollar-sign me-3"></i>الأسعار
-                            </a>
-                        @endif
-                        
-                        <a class="nav-link py-3 px-4 {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}">
-                            <i class="fas fa-chart-line me-3"></i>المبيعات
-                        </a>
-                    @endauth
-                </nav>
-            </div>
-        </div>
-
-        <div class="main-content">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" style="border-radius: 10px;">
-                    <i class="fas fa-check-circle me-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" style="border-radius: 10px;">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
-            @yield('content')
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'حمزة عطور - نظام إدارة العطور')</title>
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Vite -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    @stack('styles')
+</head>
+<body class="bg-gray-50 dark:bg-gray-800 font-tajawal transition-colors duration-300">
+
+    @auth
+        <!-- Sidebar -->
+        <div class="fixed inset-y-0 right-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full" id="sidebar">
+            <div class="flex items-center justify-center h-16 bg-gradient-to-r from-blue-500 to-blue-600">
+                <h1 class="text-white text-xl font-bold">حمزة عطور</h1>
+            </div>
+            
+            <nav class="mt-8 px-4">
+                <div class="space-y-2">
+                    @if(auth()->user()->role === 'super-admin')
+                        <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('dashboard') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
+                            <i class="fas fa-chart-line ml-3"></i>
+                            <span>لوحة التحكم</span>
+                        </a>
+                        
+                        <a href="{{ route('users.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('users.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
+                            <i class="fas fa-users ml-3"></i>
+                            <span>المستخدمين</span>
+                        </a>
+                    @endif
+                    
+                    @if(in_array(auth()->user()->role, ['super-admin', 'admin']))
+                        <a href="{{ route('perfumes.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('perfumes.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
+                            <i class="fas fa-spray-can ml-3"></i>
+                            <span>العطور</span>
+                        </a>
+                        
+                        <a href="{{ route('categories.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('categories.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
+                            <i class="fas fa-tags ml-3"></i>
+                            <span>التصنيفات</span>
+                        </a>
+                        
+                        <a href="{{ route('sizes.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('sizes.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
+                            <i class="fas fa-ruler ml-3"></i>
+                            <span>الأحجام</span>
+                        </a>
+                        
+                        <a href="{{ route('prices.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('prices.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
+                            <i class="fas fa-dollar-sign ml-3"></i>
+                            <span>الأسعار</span>
+                        </a>
+                    @endif
+                    
+                    <a href="{{ route('sales.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
+                        <i class="fas fa-shopping-cart ml-3"></i>
+                        <span>المبيعات</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <!-- Dark Mode Toggle -->
+            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+                <button id="darkModeToggle" type="button" onclick="toggleDarkMode()" class="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200">
+                    <i class="fas fa-moon dark:hidden text-gray-700 ml-3"></i>
+                    <i class="fas fa-sun hidden dark:block text-yellow-500 ml-3"></i>
+                    <span class="dark:hidden">الوضع الليلي</span>
+                    <span class="hidden dark:block">الوضع النهاري</span>
+                </button>
+            </div>
+
+            <!-- User Info -->
+            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                        {{ substr(auth()->user()->name, 0, 1) }}
+                    </div>
+                    <div class="mr-3">
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-300">
+                            @switch(auth()->user()->role)
+                                @case('super-admin')
+                                    مدير عام
+                                    @break
+                                @case('admin')
+                                    مدير
+                                    @break
+                                @case('saler')
+                                    بائع
+                                    @break
+                            @endswitch
+                        </p>
+                    </div>
+                </div>
+                
+                <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt ml-2"></i>
+                        تسجيل الخروج
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Mobile sidebar overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 z-30 bg-black bg-opacity-50 hidden lg:hidden transition-opacity duration-300"></div>
+
+        <!-- Main Content -->
+        <div class="lg:mr-64 min-h-screen transition-all duration-300">
+            <!-- Top Bar -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600">
+                <div class="flex items-center justify-between px-4 lg:px-6 py-4">
+                    <div class="flex items-center">
+                        <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100 transition-colors">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 mr-2 lg:mr-4">@yield('page-title', 'الصفحة الرئيسية')</h2>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4 space-x-reverse">
+                        <div class="text-xs lg:text-sm text-gray-500 dark:text-gray-300">
+                            {{ now()->format('Y/m/d') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <main class="p-4 lg:p-6 bg-gray-50 dark:bg-gray-800 min-h-screen">
+                @if(session('success'))
+                    <div class="mb-4 lg:mb-6 bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg relative animate-slide-up" role="alert">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle ml-2"></i>
+                            <span class="block sm:inline">{{ session('success') }}</span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="absolute top-2 left-2 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="mb-4 lg:mb-6 bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg relative animate-slide-up" role="alert">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle ml-2"></i>
+                            <span class="block sm:inline">{{ session('error') }}</span>
+                        </div>
+                        <button onclick="this.parentElement.remove()" class="absolute top-2 left-2 text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                @endif
+
+                <div class="animate-fade-in">
+                    @yield('content')
+                </div>
+            </main>
+        </div>
+    @else
+        <!-- Guest Layout -->
+        <main>
+            @yield('content')
+        </main>
+    @endauth
+
+    <!-- JavaScript -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.querySelector('.search-input');
-        if (!searchInput) return;
-        
-        let searchTimeout;
-        let searchResults = null;
-        
-        // Create search results dropdown
-        const searchDropdown = document.createElement('div');
-        searchDropdown.className = 'search-dropdown';
-        searchDropdown.style.cssText = `
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            z-index: 1000;
-            max-height: 300px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            display: none;
-            margin-top: 8px;
-            backdrop-filter: blur(10px);
-        `;
-        
-        // Add custom scrollbar styles
-        const style = document.createElement('style');
-        style.textContent = `
-            .search-dropdown::-webkit-scrollbar {
-                width: 6px;
+        // Global dark mode toggle function
+        function toggleDarkMode() {
+            console.log('toggleDarkMode called');
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            console.log('Current state - isDark:', isDark);
+            
+            if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('dark_mode', 'false');
+                console.log('Switched to light mode');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('dark_mode', 'true');
+                console.log('Switched to dark mode');
             }
-            .search-dropdown::-webkit-scrollbar-track {
-                background: #f1f1f1;
-                border-radius: 3px;
-            }
-            .search-dropdown::-webkit-scrollbar-thumb {
-                background: linear-gradient(135deg, #667eea, #764ba2);
-                border-radius: 3px;
-            }
-            .search-dropdown::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(135deg, #5a6fe0, #6b3fb1);
-            }
-        `;
-        document.head.appendChild(style);
-        
-        // Position search container relatively
-        const searchBox = document.querySelector('.search-box');
-        if (searchBox) {
-            searchBox.style.position = 'relative';
-            searchBox.appendChild(searchDropdown);
         }
-        
-        // Search function
-        async function performSearch(query) {
-            if (query.length < 2) {
-                searchDropdown.style.display = 'none';
-                return;
+
+        // Dark mode functionality
+        function initDarkMode() {
+            console.log('Initializing dark mode...');
+            
+            // Load dark mode preference on page load
+            const savedMode = localStorage.getItem('dark_mode');
+            console.log('Saved mode:', savedMode);
+            
+            if (savedMode === 'true') {
+                document.documentElement.classList.add('dark');
+                console.log('Dark mode applied on load');
             }
             
-            try {
-                const response = await fetch(`{{ route('perfumes.search') }}?q=${encodeURIComponent(query)}`);
-                const data = await response.json();
-                displayResults(data.results);
-            } catch (error) {
-                console.error('Search error:', error);
+            // Dark mode toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            console.log('Dark mode toggle element:', darkModeToggle);
+            
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Dark mode toggle clicked');
+                    
+                    const html = document.documentElement;
+                    const isDark = html.classList.contains('dark');
+                    console.log('Current state - isDark:', isDark);
+                    
+                    if (isDark) {
+                        html.classList.remove('dark');
+                        localStorage.setItem('dark_mode', 'false');
+                        console.log('Switched to light mode');
+                    } else {
+                        html.classList.add('dark');
+                        localStorage.setItem('dark_mode', 'true');
+                        console.log('Switched to dark mode');
+                    }
+                });
+            } else {
+                console.error('Dark mode toggle button not found!');
             }
         }
-        
-        // Display search results
-        function displayResults(results) {
-            if (results.length === 0) {
-                searchDropdown.innerHTML = `
-                    <div class="p-4 text-center">
-                        <i class="fas fa-search text-muted mb-2" style="font-size: 2rem;"></i>
-                        <div class="text-muted">لا توجد نتائج</div>
-                    </div>
-                `;
-            } else {
-                searchDropdown.innerHTML = results.map(perfume => `
-                    <div class="search-result-item" style="padding: 18px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #ffffff, #fafbfc);">
-                        <div class="fw-bold text-dark" style="font-size: 1rem; color: #2c3e50;">${perfume.name}</div>
-                        <span class="badge bg-info px-4 py-2" style="border-radius: 20px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);">
-                            <i class="fas fa-tag me-2"></i>${perfume.category}
-                        </span>
-                    </div>
-                `).join('');
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing dark mode...');
+            initDarkMode();
+        });
+
+        // Also try to initialize immediately (in case DOM is already loaded)
+        if (document.readyState !== 'loading') {
+            console.log('DOM already loaded, initializing dark mode immediately...');
+            initDarkMode();
+        }
+
+        // Mobile sidebar toggle
+        function initSidebar() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (sidebarToggle && sidebar && overlay) {
+                sidebarToggle.addEventListener('click', function() {
+                    const isHidden = sidebar.classList.contains('-translate-x-full');
+                    
+                    if (isHidden) {
+                        sidebar.classList.remove('-translate-x-full');
+                        overlay.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden'; // منع التمرير
+                    } else {
+                        sidebar.classList.add('-translate-x-full');
+                        overlay.classList.add('hidden');
+                        document.body.style.overflow = ''; // إعادة التمرير
+                    }
+                });
+
+                // Close sidebar when clicking overlay
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                });
                 
-                // Add click handlers
-                searchDropdown.querySelectorAll('.search-result-item').forEach((item, index) => {
-                    item.addEventListener('click', () => {
-                        window.location.href = results[index].url;
-                    });
-                    item.addEventListener('mouseenter', () => {
-                        item.style.backgroundColor = '#f8f9fa';
-                    });
-                    item.addEventListener('mouseleave', () => {
-                        item.style.backgroundColor = 'linear-gradient(135deg, #ffffff, #fafbfc)';
-                    });
+                // Close sidebar on escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && !sidebar.classList.contains('-translate-x-full')) {
+                        sidebar.classList.add('-translate-x-full');
+                        overlay.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    }
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 1024) { // lg breakpoint
+                        sidebar.classList.remove('-translate-x-full');
+                        overlay.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    } else {
+                        sidebar.classList.add('-translate-x-full');
+                    }
                 });
             }
-            searchDropdown.style.display = 'block';
         }
+
+        // Initialize sidebar when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSidebar);
+        } else {
+            initSidebar();
+        }
+
+        // Auto-hide alerts
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('[role="alert"]');
+            alerts.forEach(function(alert) {
+                if (!alert.querySelector('button')) { // فقط إذا لم يكن هناك زر إغلاق
+                    alert.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-20px)';
+                    setTimeout(function() {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 500);
+                }
+            });
+        }, 5000);
         
-        // Input event handler
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            const query = this.value.trim();
-            
-            if (query.length >= 2) {
-                searchTimeout = setTimeout(() => performSearch(query), 300);
-            } else {
-                searchDropdown.style.display = 'none';
+        // Add loading states to forms
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.tagName === 'FORM') {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i>جاري المعالجة...';
+                }
             }
         });
-        
-        // Hide dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!searchBox.contains(e.target)) {
-                searchDropdown.style.display = 'none';
-            }
-        });
-        
-        // Focus handling
-        searchInput.addEventListener('focus', function() {
-            if (this.value.trim().length >= 2) {
-                searchDropdown.style.display = 'block';
-            }
-        });
-    });
     </script>
+
+    @stack('scripts')
 </body>
 </html>

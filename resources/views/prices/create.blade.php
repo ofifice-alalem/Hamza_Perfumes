@@ -1,52 +1,59 @@
 @extends('layouts.app')
 
 @section('title', 'إضافة أسعار جديدة')
+@section('page-title', 'إضافة أسعار جديدة')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
-        <div class="card-modern mb-4">
-            <div class="card-header d-flex align-items-center" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px 15px 0 0;">
-                <h5 class="mb-0"></h5>
-            </div>
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <i class="fas fa-dollar-sign ml-2 text-blue-600"></i>إضافة أسعار جديدة
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300">إضافة أسعار للعطور غير المصنفة</p>
+    </div>
+    <a href="{{ route('prices.index') }}" class="btn-secondary">
+        <i class="fas fa-arrow-right ml-2"></i>العودة للقائمة
+    </a>
+</div>
+
+<div class="max-w-4xl mx-auto">
+    <div class="card">
+        <div class="card-header bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <h5 class="text-lg font-bold">
+                <i class="fas fa-dollar-sign ml-2"></i>بيانات الأسعار
+            </h5>
+        </div>
             <div class="card-body p-4">
                 <form action="{{ route('prices.store') }}" method="POST">
                     @csrf
                     
-                    <div class="mb-4">
-                        <h4 class="mb-0 fw-bold">إضافة أسعار جديدة</h4>
-                    </div>
 
-                    <div class="mb-4">
-                        <label for="perfume_search" class="form-label fw-semibold">العطر (العطور غير المصنفة فقط)</label>
-                        <div class="search-container position-relative">
+
+                    <div class="mb-6">
+                        <label for="perfume_search" class="form-label">العطر (العطور غير المصنفة فقط)</label>
+                        <div class="search-container relative">
                             <input type="text" 
-                                   class="form-control @error('perfume_id') is-invalid @enderror" 
+                                   class="form-input @error('perfume_id') error @enderror pr-12" 
                                    id="perfume_search" 
                                    name="perfume_search"
                                    placeholder="ابحث عن العطر غير المصنف..."
                                    value="{{ old('perfume_search') }}"
-                                   style="border-radius: 12px; padding: 12px 45px 12px 20px; border: 2px solid #e9ecef; transition: all 0.3s;"
                                    autocomplete="off">
-                            <i class="fas fa-search search-icon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+                            <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                             <input type="hidden" id="perfume_id" name="perfume_id" value="{{ old('perfume_id') }}" required>
-                            <div id="perfume_dropdown" class="search-dropdown" style="display: none;"></div>
+                            <div id="perfume_dropdown" class="search-dropdown hidden"></div>
                             @error('perfume_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="form-error">{{ $message }}</div>
                             @enderror
                         </div>
-                        <small class="text-muted">يمكن إضافة أسعار للعطور غير المصنفة فقط. العطور المصنفة لها أسعار ثابتة.</small>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">يمكن إضافة أسعار للعطور غير المصنفة فقط</p>
                     </div>
 
-                    <!-- معلومات العبوة الكاملة -->
-                    <h5 class="mb-4 fw-bold">معلومات العبوة الكاملة</h5>
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <label for="bottle_size" class="form-label fw-semibold">حجم العبوة الكاملة</label>
-                            <select class="form-select @error('bottle_size') is-invalid @enderror" 
-                                    id="bottle_size" 
-                                    name="bottle_size" 
-                                    style="border-radius: 12px; padding: 12px 14px;">
+                    <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-4">معلومات العبوة الكاملة</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label for="bottle_size" class="form-label">حجم العبوة الكاملة</label>
+                            <select class="form-select @error('bottle_size') error @enderror" id="bottle_size" name="bottle_size">
                                 <option value="">اختر حجم العبوة</option>
                                 @foreach($sizes as $size)
                                     <option value="{{ $size->label }}" {{ old('bottle_size') == $size->label ? 'selected' : '' }}>
@@ -55,76 +62,66 @@
                                 @endforeach
                             </select>
                             @error('bottle_size')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="form-error">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-4">
-                            <label for="bottle_price_regular" class="form-label fw-semibold">سعر العبوة - عادي (دينار)</label>
-                            <input type="number" step="0.01" 
-                                   class="form-control @error('bottle_price_regular') is-invalid @enderror" 
-                                   id="bottle_price_regular" 
-                                   name="bottle_price_regular" 
-                                   value="{{ old('bottle_price_regular') }}"
-                                   placeholder="0.00"
-                                   style="border-radius: 12px; padding: 12px 14px;">
+                        <div>
+                            <label for="bottle_price_regular" class="form-label">سعر العبوة - عادي (دينار)</label>
+                            <input type="number" step="0.01" class="form-input @error('bottle_price_regular') error @enderror" 
+                                   id="bottle_price_regular" name="bottle_price_regular" 
+                                   value="{{ old('bottle_price_regular') }}" placeholder="0.00">
                             @error('bottle_price_regular')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="form-error">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-4">
-                            <label for="bottle_price_vip" class="form-label fw-semibold">سعر العبوة - VIP (دينار)</label>
-                            <input type="number" step="0.01" 
-                                   class="form-control @error('bottle_price_vip') is-invalid @enderror" 
-                                   id="bottle_price_vip" 
-                                   name="bottle_price_vip" 
-                                   value="{{ old('bottle_price_vip') }}"
-                                   placeholder="0.00"
-                                   style="border-radius: 12px; padding: 12px 14px;">
+                        <div>
+                            <label for="bottle_price_vip" class="form-label">سعر العبوة - VIP (دينار)</label>
+                            <input type="number" step="0.01" class="form-input @error('bottle_price_vip') error @enderror" 
+                                   id="bottle_price_vip" name="bottle_price_vip" 
+                                   value="{{ old('bottle_price_vip') }}" placeholder="0.00">
                             @error('bottle_price_vip')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="form-error">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
 
-                    <h5 class="mb-4 fw-bold">الأسعار حسب الأحجام المقسمة</h5>
-                    <div class="table-responsive">
-                        <table class="table table-modern">
+                    <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">الأسعار حسب الأحجام</h4>
+                    <div class="overflow-x-auto">
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th class="border-0">الحجم</th>
-                                    <th class="border-0">السعر العادي (دينار)</th>
-                                    <th class="border-0">سعر VIP (دينار)</th>
+                                    <th>الحجم</th>
+                                    <th>السعر العادي (ر.س)</th>
+                                    <th>سعر VIP (ر.س)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($sizes as $size)
                                 <tr>
-                                    <td class="align-middle">
-                                        <span class="badge bg-secondary px-3 py-2 fw-semibold" style="border-radius: 15px;">
-                                            <i class="fas fa-ruler me-1"></i>{{ $size->label }}
+                                    <td>
+                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                                            {{ $size->label }}
                                         </span>
                                         <input type="hidden" name="sizes[{{ $size->id }}][size_id]" value="{{ $size->id }}">
                                     </td>
                                     <td>
                                         <input type="number" step="0.01" 
-                                               class="form-control @error('sizes.'.$size->id.'.price_regular') is-invalid @enderror" 
+                                               class="form-input @error('sizes.'.$size->id.'.price_regular') error @enderror" 
                                                name="sizes[{{ $size->id }}][price_regular]" 
                                                value="{{ old('sizes.'.$size->id.'.price_regular') }}"
-                                               placeholder="0.00"
-                                               style="border-radius: 10px; padding: 10px 12px;">
+                                               placeholder="0.00">
                                         @error('sizes.'.$size->id.'.price_regular')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="form-error">{{ $message }}</div>
                                         @enderror
                                     </td>
                                     <td>
                                         <input type="number" step="0.01" 
-                                               class="form-control @error('sizes.'.$size->id.'.price_vip') is-invalid @enderror" 
+                                               class="form-input @error('sizes.'.$size->id.'.price_vip') error @enderror" 
                                                name="sizes[{{ $size->id }}][price_vip]" 
                                                value="{{ old('sizes.'.$size->id.'.price_vip') }}"
-                                               placeholder="0.00"
-                                               style="border-radius: 10px; padding: 10px 12px;">
+                                               placeholder="0.00">
                                         @error('sizes.'.$size->id.'.price_vip')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="form-error">{{ $message }}</div>
                                         @enderror
                                     </td>
                                 </tr>
@@ -133,12 +130,12 @@
                         </table>
                     </div>
                     
-                    <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary btn-modern d-inline-flex align-items-center gap-2" style="border-radius: 12px;">
-                            حفظ جميع الأسعار <i class="fas fa-save"></i>
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" class="flex-1 btn-success">
+                            <i class="fas fa-save ml-2"></i>حفظ جميع الأسعار
                         </button>
-                        <a href="{{ route('prices.index') }}" class="btn btn-secondary btn-modern d-inline-flex align-items-center gap-2" style="border-radius: 12px;">
-                            رجوع للقائمة <i class="fas fa-arrow-left"></i>
+                        <a href="{{ route('prices.index') }}" class="flex-1 btn-secondary text-center">
+                            <i class="fas fa-arrow-right ml-2"></i>رجوع للقائمة
                         </a>
                     </div>
                 </form>
@@ -147,60 +144,7 @@
     </div>
 </div>
 
-<style>
-.btn-modern {
-    border-radius: 12px;
-    padding: 10px 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-}
-.btn-modern i { font-size: .95rem; }
-.btn-modern:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-.btn-primary.btn-modern { background: linear-gradient(135deg, #667eea, #764ba2); border: none; }
-.btn-primary.btn-modern:hover { background: linear-gradient(135deg, #5a6fe0, #6b3fb1); }
-.btn-secondary.btn-modern { background: #f1f3f5; color: #343a40; border: none; }
-.btn-secondary.btn-modern:hover { background: #e9ecef; }
 
-.table-modern {
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.table-modern thead {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-}
-
-.table-modern thead th {
-    padding: 20px 15px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.table-modern tbody tr {
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.table-modern tbody tr:last-child {
-    border-bottom: none;
-}
-
-.table-modern tbody td {
-    padding: 20px 15px;
-    vertical-align: middle;
-}
-
-.table-modern tbody tr:hover {
-    background-color: #f8f9fa;
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

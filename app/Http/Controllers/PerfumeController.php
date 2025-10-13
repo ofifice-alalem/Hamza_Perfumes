@@ -10,7 +10,9 @@ class PerfumeController extends Controller
 {
     public function index()
     {
-        $perfumes = Perfume::all();
+        $perfumes = Perfume::with(['category', 'perfumePrices'])
+            ->withCount('sales')
+            ->paginate(15);
         return view('perfumes.index', compact('perfumes'));
     }
 

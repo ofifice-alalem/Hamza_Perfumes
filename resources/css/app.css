@@ -6,6 +6,311 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Tajawal', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    
+    /* Custom color palette */
+    --color-primary: #3b82f6;
+    --color-primary-dark: #1d4ed8;
+    --color-secondary: #6b7280;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #06b6d4;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+/* Custom utility classes */
+.glass-morphism {
+  @apply backdrop-blur-lg bg-white/30 border border-white/20;
+}
+
+.dark .glass-morphism {
+  @apply bg-gray-900/30 border-gray-700/20;
+}
+
+.floating-element {
+  @apply transform transition-all duration-300 hover:scale-105 hover:shadow-xl;
+}
+
+/* RTL improvements */
+[dir="rtl"] .ml-2 {
+  @apply mr-2 ml-0;
+}
+
+[dir="rtl"] .ml-3 {
+  @apply mr-3 ml-0;
+}
+
+[dir="rtl"] .mr-3 {
+  @apply ml-3 mr-0;
+}
+
+[dir="rtl"] .mr-4 {
+  @apply ml-4 mr-0;
+}
+
+/* Custom button styles */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-primary:active {
+  @apply transform scale-95;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-secondary:active {
+  @apply transform scale-95;
+}
+
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-danger:active {
+  @apply transform scale-95;
+}
+
+.btn-success {
+  @apply bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-success:active {
+  @apply transform scale-95;
+}
+
+.btn-warning {
+  @apply bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-warning:active {
+  @apply transform scale-95;
+}
+
+/* Button sizes */
+.btn-sm {
+  @apply py-1 px-3 text-sm;
+}
+
+.btn-lg {
+  @apply py-3 px-6 text-lg;
+}
+
+/* Button states */
+.btn:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.btn:disabled:hover {
+  @apply transform-none shadow-sm;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white dark:bg-gray-700 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 transition-all duration-300;
+}
+
+.card:hover {
+  @apply shadow-xl;
+}
+
+.card-header {
+  @apply px-6 py-4 border-b border-gray-200 dark:border-gray-600 rounded-t-xl;
+}
+
+.card-body {
+  @apply px-6 py-4;
+}
+
+.card-footer {
+  @apply px-6 py-4 border-t border-gray-200 dark:border-gray-600 rounded-b-xl;
+}
+
+/* Card variants */
+.card-compact {
+  @apply p-4;
+}
+
+.card-compact .card-header {
+  @apply px-4 py-3;
+}
+
+.card-compact .card-body {
+  @apply px-4 py-3;
+}
+
+.card-compact .card-footer {
+  @apply px-4 py-3;
+}
+
+/* Responsive cards */
+@media (max-width: 768px) {
+  .card {
+    @apply mx-2;
+  }
+  
+  .card-header,
+  .card-body,
+  .card-footer {
+    @apply px-4 py-3;
+  }
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white transition-all duration-200;
+}
+
+.form-input:focus {
+  @apply shadow-md;
+}
+
+.form-select {
+  @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-600 dark:text-white transition-all duration-200;
+}
+
+.form-select:focus {
+  @apply shadow-md;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+}
+
+/* Form validation states */
+.form-input.error {
+  @apply border-red-500 focus:ring-red-500;
+}
+
+.form-input.success {
+  @apply border-green-500 focus:ring-green-500;
+}
+
+.form-error {
+  @apply text-red-500 text-xs mt-1;
+}
+
+.form-success {
+  @apply text-green-500 text-xs mt-1;
+}
+
+/* Table styles */
+.table {
+  @apply w-full border-collapse;
+}
+
+.table th {
+  @apply px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-500 bg-gray-50 dark:bg-gray-600;
+}
+
+.table td {
+  @apply px-4 py-3 text-sm text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-500;
+}
+
+.table tbody tr {
+  @apply transition-colors duration-200;
+}
+
+.table tbody tr:hover {
+  @apply bg-gray-50 dark:bg-gray-600;
+}
+
+.table tbody tr:last-child td {
+  @apply border-b-0;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    @apply px-2 py-2 text-xs;
+  }
+  
+  .table th {
+    @apply text-center;
+  }
+}
+
+/* Stats cards */
+.stats-card {
+  @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg transition-all duration-300;
+}
+
+.stats-card:hover {
+  @apply transform -translate-y-1 shadow-xl;
+}
+
+.stats-card .stats-title {
+  @apply text-sm font-medium opacity-90 mb-2;
+}
+
+.stats-card .stats-value {
+  @apply text-3xl font-bold mb-1;
+}
+
+.stats-card .stats-change {
+  @apply text-xs opacity-75;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .stats-card {
+    @apply p-4;
+  }
+  
+  .stats-card .stats-value {
+    @apply text-2xl;
+  }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading states */
+.loading {
+  @apply opacity-50 pointer-events-none;
+}
+
+.loading::after {
+  content: '';
+  @apply absolute inset-0 bg-white/50 rounded-lg;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="%23e5e7eb" stroke-width="2"/><path d="M12 2a10 10 0 0 1 10 10" stroke="%233b82f6" stroke-width="2" stroke-linecap="round"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

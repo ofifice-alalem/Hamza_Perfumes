@@ -1,151 +1,67 @@
 @extends('layouts.app')
 
 @section('title', 'إضافة عطر جديد')
+@section('page-title', 'إضافة عطر جديد')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-lg-8 col-md-10">
-        <div class="card-modern mb-4">
-            <div class="card-header d-flex align-items-center" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px 15px 0 0;">
-                <h5 class="mb-0"></h5>
-            </div>
-            <div class="card-body p-4">
-                <form action="{{ route('perfumes.store') }}" method="POST" id="createPerfumeForm">
-                    @csrf
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <i class="fas fa-spray-can ml-2 text-blue-600"></i>إضافة عطر جديد
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300">إضافة عطر جديد للنظام</p>
+    </div>
+    <a href="{{ route('perfumes.index') }}" class="btn-secondary">
+        <i class="fas fa-arrow-right ml-2"></i>العودة للقائمة
+    </a>
+</div>
 
-                    <div class="mb-4">
-                        <h4 class="mb-0 fw-bold">إضافة عطر جديد</h4>
+<div class="max-w-2xl mx-auto">
+    <div class="card">
+        <div class="card-header bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <h5 class="text-lg font-bold">
+                <i class="fas fa-spray-can ml-2"></i>بيانات العطر الجديد
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('perfumes.store') }}">
+                @csrf
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="form-label">اسم العطر</label>
+                        <input type="text" id="name" name="name" class="form-input @error('name') error @enderror" value="{{ old('name') }}" required>
+                        @error('name')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
                     </div>
 
-                    <!-- اسم العطر -->
-                    <div class="mb-3">
-                        <label for="name" class="form-label fw-semibold">اسم العطر</label>
-                        <div class="position-relative">
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                   id="name" name="name" value="{{ old('name') }}" required
-                                   placeholder="مثال: عطر المسك الأبيض" 
-                                   style="border-radius: 12px; padding: 12px 14px;">
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div id="nameExistsMsg" class="mt-2 text-danger" style="display:none; font-weight:600;">
-                            العطر موجود بالفعل
-                        </div>
+                    <div>
+                        <label for="category_id" class="form-label">التصنيف</label>
+                        <select id="category_id" name="category_id" class="form-select @error('category_id') error @enderror">
+                            <option value="">اختر التصنيف</option>
+                            @foreach($categories ?? [] as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('category_id')
+                            <div class="form-error">{{ $message }}</div>
+                        @enderror
                     </div>
+                </div>
 
-                    <!-- التصنيف -->
-                    <div class="mb-4">
-                        <label for="category_id" class="form-label fw-semibold">التصنيف</label>
-                        <div class="position-relative">
-                            <i class="fas fa-tags position-absolute" style="right: 12px; top: 50%; transform: translateY(-50%); color:#6c757d; pointer-events: none;"></i>
-                            <select class="form-select pretty-select @error('category_id') is-invalid @enderror" 
-                                    id="category_id" name="category_id"
-                                    style="border-radius: 14px; padding: 12px 44px 12px 36px; appearance: none; -webkit-appearance: none; -moz-appearance: none; background: #f8f9fb; border: 2px solid #edf0f3;">
-                                <option value="">&nbsp;&nbsp;&nbsp;&nbsp;اختر التصنيف (اختياري)</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <i class="fas fa-chevron-down position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); color:#6c757d; pointer-events: none;"></i>
-                            @error('category_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="d-flex gap-2">
-                        <button type="submit" id="submitBtn" class="btn btn-primary btn-modern d-inline-flex align-items-center gap-2" style="border-radius: 12px;">
-                            حفظ العطر <i class="fas fa-save"></i>
-                        </button>
-                        <a href="{{ route('perfumes.index') }}" class="btn btn-secondary btn-modern d-inline-flex align-items-center gap-2" style="border-radius: 12px;">
-                            رجوع للقائمة <i class="fas fa-arrow-left"></i>
-                        </a>
-                    </div>
-                </form>
-            </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="submit" class="flex-1 btn-success">
+                        <i class="fas fa-save ml-2"></i>حفظ العطر
+                    </button>
+                    <a href="{{ route('perfumes.index') }}" class="flex-1 btn-secondary text-center">
+                        <i class="fas fa-times ml-2"></i>إلغاء
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-<style>
-.btn-modern {
-    border-radius: 12px;
-    padding: 10px 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px; /* مسافة واضحة بين النص والأيقونة */
-    font-weight: 600;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-}
-.btn-modern i { font-size: .95rem; }
-.btn-modern:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-.btn-primary.btn-modern { background: linear-gradient(135deg, #667eea, #764ba2); border: none; }
-.btn-primary.btn-modern:hover { background: linear-gradient(135deg, #5a6fe0, #6b3fb1); }
-.btn-secondary.btn-modern { background: #f1f3f5; color: #343a40; border: none; }
-.btn-secondary.btn-modern:hover { background: #e9ecef; }
-
-/* Pretty select enhancements */
-.pretty-select { transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
-.pretty-select:hover { border-color: #dfe3e8; }
-.pretty-select:focus { border-color: #667eea; box-shadow: 0 0 0 4px rgba(102,126,234,0.12); background: #ffffff; }
-.pretty-select option { padding: 8px; }
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const nameInput = document.getElementById('name');
-    const nameMsg = document.getElementById('nameExistsMsg');
-    const submitBtn = document.getElementById('submitBtn');
-
-    let lastQuery = '';
-    let controller;
-
-    async function checkUnique(name) {
-        const url = `{{ route('perfumes.checkUnique') }}?name=${encodeURIComponent(name)}`;
-        if (controller) controller.abort();
-        controller = new AbortController();
-        const res = await fetch(url, { signal: controller.signal });
-        if (!res.ok) return { exists: false };
-        return await res.json();
-    }
-
-    function setState(exists) {
-        if (exists) {
-            nameInput.classList.add('is-invalid');
-            nameMsg.style.display = 'block';
-            submitBtn.disabled = true;
-            submitBtn.style.opacity = .75;
-        } else {
-            nameInput.classList.remove('is-invalid');
-            nameMsg.style.display = 'none';
-            submitBtn.disabled = false;
-            submitBtn.style.opacity = 1;
-        }
-    }
-
-    function debounce(fn, ms) {
-        let t; return function(...args){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), ms); };
-    }
-
-    const onInput = debounce(async () => {
-        const value = nameInput.value.trim();
-        if (value === '') {
-            setState(false);
-            return;
-        }
-        lastQuery = value;
-        try {
-            const { exists } = await checkUnique(value);
-            // Ensure response matches latest input
-            if (lastQuery === value) setState(exists);
-        } catch (_) { /* ignore */ }
-    }, 300);
-
-    nameInput.addEventListener('input', onInput);
-});
-</script>
 @endsection

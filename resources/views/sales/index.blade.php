@@ -1,79 +1,85 @@
 @extends('layouts.app')
 
 @section('title', 'المبيعات')
+@section('page-title', 'المبيعات')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="flex justify-between items-center mb-6">
     <div>
-        <h2 class="mb-1"><i class="fas fa-chart-line me-2 text-primary"></i>المبيعات</h2>
-        <p class="text-muted mb-0">إدارة مبيعات العطور ومتابعة الإيرادات</p>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <i class="fas fa-chart-line ml-2 text-blue-600"></i>المبيعات
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300">إدارة مبيعات العطور ومتابعة الإيرادات</p>
     </div>
 </div>
 
 <!-- نموذج البيع -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card-modern">
-            <div class="card-body p-4">
-                <form action="{{ route('sales.store') }}" method="POST" id="saleForm" class="row g-3">
-                    @csrf
-                    <div class="col">
-                        <label for="perfume_search" class="form-label fw-semibold">العطر</label>
-                        <div class="search-container position-relative">
-                            <input type="text" 
-                                   class="form-control @error('perfume_id') is-invalid @enderror" 
-                                   id="perfume_search" 
-                                   name="perfume_search"
-                                   placeholder="ابحث عن العطر..."
-                                   style="border-radius: 10px; padding: 12px 45px 12px 20px; height: 48px;"
-                                   autocomplete="off">
-                            <i class="fas fa-search search-icon" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
-                            <input type="hidden" id="perfume_id" name="perfume_id" value="{{ request('perfume_id') }}" required>
-                            <div id="perfume_dropdown" class="search-dropdown" style="display: none;"></div>
-                            @error('perfume_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <label for="size_id" class="form-label fw-semibold">الحجم</label>
-                        <select class="form-select @error('size_id') is-invalid @enderror" 
-                                id="size_id" name="size_id" required style="border-radius: 10px; height: 48px;" disabled>
-                            <option value="">اختر العطر أولاً</option>
-                        </select>
-                        @error('size_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
+<div class="mb-6">
+    <div class="card">
+        <div class="card-header bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <h5 class="text-lg font-bold">
+                <i class="fas fa-shopping-cart ml-2"></i>نموذج البيع
+            </h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('sales.store') }}" method="POST" id="saleForm" class="flex gap-4">
+                @csrf
+                <div class="flex-2" style="flex: 2;">
+                    <label for="perfume_search" class="form-label">العطر</label>
+                    <div class="search-container relative">
+                        <input type="text" 
+                               class="form-input @error('perfume_id') error @enderror pr-12" 
+                               id="perfume_search" 
+                               name="perfume_search"
+                               placeholder="ابحث عن العطر..."
+                               autocomplete="off">
+                        <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="hidden" id="perfume_id" name="perfume_id" value="{{ request('perfume_id') }}" required>
+                        <div id="perfume_dropdown" class="search-dropdown hidden"></div>
+                        @error('perfume_id')
+                            <div class="form-error">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
-                    <div class="col">
-                        <label for="customer_type" class="form-label fw-semibold">نوع العميل</label>
-                        <select class="form-select @error('customer_type') is-invalid @enderror" 
-                                id="customer_type" name="customer_type" required style="border-radius: 10px; height: 48px;">
-                            <option value="">اختر نوع العميل</option>
-                            <option value="regular">عادي</option>
-                            <option value="vip">VIP</option>
-                        </select>
-                        @error('customer_type')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                <div class="flex-1">
+                    <label for="size_id" class="form-label">الحجم</label>
+                    <select class="form-select @error('size_id') error @enderror" 
+                            id="size_id" name="size_id" required disabled>
+                        <option value="">اختر العطر أولاً</option>
+                    </select>
+                    @error('size_id')
+                        <div class="form-error">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                    <div class="col">
-                        <label class="form-label fw-semibold">السعر</label>
-                        <div class="alert alert-info d-flex align-items-center" id="priceDisplay" style="border-radius: 10px; height: 48px; margin-bottom: 0; padding: 8px 12px;">
-                            <i class="fas fa-info-circle me-2"></i>اختر العطر والحجم ونوع العميل
-                        </div>
-                    </div>
+                <div class="flex-1">
+                    <label for="customer_type" class="form-label">نوع العميل</label>
+                    <select class="form-select @error('customer_type') error @enderror" 
+                            id="customer_type" name="customer_type" required>
+                        <option value="">اختر نوع العميل</option>
+                        <option value="regular">عادي</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                    @error('customer_type')
+                        <div class="form-error">{{ $message }}</div>
+                    @enderror
+                </div>
 
-                    <div class="col-auto d-flex align-items-end">
-                        <button type="submit" class="btn btn-success btn-modern" id="sellBtn" disabled style="height: 48px; border-radius: 10px;">
-                            <i class="fas fa-shopping-cart me-2"></i>بيع
-                        </button>
+                <div class="flex-1">
+                    <label class="form-label">السعر</label>
+                    <div class="flex items-center h-12 px-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" id="priceDisplay">
+                        <i class="fas fa-info-circle ml-2 text-blue-600"></i>
+                        <span class="text-blue-800 dark:text-blue-200 text-sm">اختر العطر والحجم ونوع العميل</span>
                     </div>
-                </form>
-            </div>
+                </div>
+
+                <div class="flex items-end flex-1">
+                    <button type="submit" class="w-full btn-success h-12" id="sellBtn" disabled>
+                        <i class="fas fa-shopping-cart ml-2"></i>بيع
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -82,112 +88,104 @@
 <div class="row">
     <div class="col-12">
         @if($sales->count() > 0)
-            <!-- إحصائيات سريعة -->
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #17a2b8, #6f42c1);">
-                        <div class="stats-sublabel">{{ $sales->where('customer_type', 'regular')->count() }} عميل</div>
-                        <div class="stats-label">عملاء عاديين</div>
-                        <div class="stats-number">{{ number_format($sales->where('customer_type', 'regular')->sum('price'), 0) }} دينار</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #ff6b35, #f7931e);">
-                        <div class="stats-sublabel">{{ $sales->where('customer_type', 'vip')->count() }} عميل</div>
-                        <div class="stats-label">عملاء VIP</div>
-                        <div class="stats-number">{{ number_format($sales->where('customer_type', 'vip')->sum('price'), 0) }} دينار</div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #28a745, #20c997);">
-                        <div class="stats-sublabel">{{ $sales->count() }} عميل</div>
-                        <div class="stats-label">إجمالي العملاء</div>
-                        <div class="stats-number">{{ number_format($sales->sum('price'), 0) }} دينار</div>
-                    </div>
-                </div>
-            </div>
+    <!-- إحصائيات سريعة -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="stats-card bg-gradient-to-r from-cyan-500 to-purple-600">
+            <div class="stats-value">{{ number_format($sales->where('customer_type', 'regular')->sum('price'), 0) }}</div>
+            <div class="stats-title">عملاء عاديين</div>
+            <div class="stats-subtitle">{{ $sales->where('customer_type', 'regular')->count() }} عميل</div>
+        </div>
+        <div class="stats-card bg-gradient-to-r from-orange-500 to-red-500">
+            <div class="stats-value">{{ number_format($sales->where('customer_type', 'vip')->sum('price'), 0) }}</div>
+            <div class="stats-title">عملاء VIP</div>
+            <div class="stats-subtitle">{{ $sales->where('customer_type', 'vip')->count() }} عميل</div>
+        </div>
+        <div class="stats-card bg-gradient-to-r from-green-500 to-emerald-500">
+            <div class="stats-value">{{ number_format($sales->sum('price'), 0) }}</div>
+            <div class="stats-title">إجمالي المبيعات</div>
+            <div class="stats-subtitle">{{ $sales->count() }} عملية بيع</div>
+        </div>
+    </div>
 
-            <div class="card-modern">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-modern mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">#</th>
-                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">العطر</th>
-                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">الحجم</th>
-                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">نوع العميل</th>
-                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">البائع</th>
-                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">السعر</th>
-                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">التاريخ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($sales as $sale)
-                                <tr>
-                                    <td class="fw-bold" style="padding: 20px 15px; font-size: 0.95rem; text-align: center;">{{ $sale->id }}</td>
-                                    <td style="padding: 20px 15px; text-align: center;">
-                                        <span class="badge px-3 py-2 fw-semibold" style="border-radius: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;">
-                                            {{ $sale->perfume->name }}
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-right">#</th>
+                            <th class="text-right">العطر</th>
+                            <th class="text-right">الحجم</th>
+                            <th class="text-right">نوع العميل</th>
+                            <th class="text-right">البائع</th>
+                            <th class="text-right">السعر</th>
+                            <th class="text-right">التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($sales as $sale)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                            <td class="text-right font-bold">{{ $sale->id }}</td>
+                            <td class="text-right">
+                                <span class="text-gray-900 dark:text-white font-medium">
+                                    {{ $sale->perfume->name }}
+                                </span>
+                            </td>
+                            <td class="text-right">
+                                @if($sale->size_id && $sale->size)
+                                    @if($sale->is_full_bottle)
+                                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                            <i class="fas fa-wine-bottle ml-1"></i>{{ $sale->size->label }} (عبوة كاملة)
                                         </span>
-                                    </td>
-                                    <td style="padding: 20px 15px; text-align: center;">
-                                        @if($sale->size_id && $sale->size)
-                                            @if($sale->is_full_bottle)
-                                                <span class="badge px-3 py-2" style="border-radius: 15px; background:#fff3cd; color:#856404; font-weight:600;">
-                                                    <i class="fas fa-wine-bottle me-1" style="color:#856404;"></i>{{ $sale->size->label }} (عبوة كاملة)
-                                                </span>
-                                            @else
-                                                <span class="badge px-3 py-2" style="border-radius: 15px; background:#eef2ff; color:#374151; font-weight:600;">
-                                                    <i class="fas fa-ruler me-1" style="color:#6366f1;"></i>{{ $sale->size->label }}
-                                                </span>
-                                            @endif
-                                        @else
-                                            <span class="badge px-3 py-2" style="border-radius: 15px; background:#fff3cd; color:#856404; font-weight:600;">
-                                                <i class="fas fa-wine-bottle me-1" style="color:#856404;"></i>عبوة كاملة
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td style="padding: 20px 15px; text-align: center;">
-                                        <span class="badge px-3 py-2" style="border-radius: 15px; background:{{ $sale->customer_type === 'vip' ? '#fff3cd' : '#d1ecf1' }}; color:{{ $sale->customer_type === 'vip' ? '#856404' : '#0c5460' }}; font-weight:600;">
-                                            <i class="fas {{ $sale->customer_type === 'vip' ? 'fa-crown' : 'fa-user' }} me-1"></i>
-                                            {{ $sale->customer_type === 'vip' ? 'VIP' : 'عادي' }}
+                                    @else
+                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                                            {{ $sale->size->label }}
                                         </span>
-                                    </td>
-                                    <td style="padding: 20px 15px; text-align: center;">
-                                        @if($sale->user)
-                                            <span class="badge px-3 py-2" style="border-radius: 15px; background:#f0f8ff; color:#0066cc; font-weight:600;">
-                                                <i class="fas fa-user-tie me-1"></i>{{ $sale->user->name }}
-                                            </span>
-                                        @else
-                                            <span class="badge px-3 py-2" style="border-radius: 15px; background:#f8f9fa; color:#6c757d; font-weight:600;">
-                                                <i class="fas fa-question me-1"></i>غير محدد
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td style="padding: 20px 15px; text-align: center;">
-                                        <span class="badge px-3 py-2" style="border-radius: 15px; background:#e8f5e8; color:#28a745; font-weight:600;">
-                                            {{ number_format($sale->price, 2) }} دينار
-                                        </span>
-                                    </td>
-                                    <td style="padding: 20px 15px; text-align: center;">
-                                        <span class="text-muted">
-                                            {{ $sale->created_at->format('Y-m-d H:i') }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                                    @endif
+                                @else
+                                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                        <i class="fas fa-wine-bottle ml-1"></i>عبوة كاملة
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="text-right">
+                                <span class="px-2 py-1 text-xs rounded-full {{ $sale->customer_type === 'vip' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
+                                    <i class="fas {{ $sale->customer_type === 'vip' ? 'fa-crown' : 'fa-user' }} ml-1"></i>
+                                    {{ $sale->customer_type === 'vip' ? 'VIP' : 'عادي' }}
+                                </span>
+                            </td>
+                            <td class="text-right">
+                                @if($sale->user)
+                                    <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                        {{ $sale->user->name }}
+                                    </span>
+                                @else
+                                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                                        غير محدد
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="text-right">
+                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 font-semibold">
+                                    {{ number_format($sale->price, 2) }} دينار
+                                </span>
+                            </td>
+                            <td class="text-right text-gray-500 dark:text-gray-400 text-sm">
+                                {{ $sale->created_at->format('Y-m-d H:i') }}
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
+        </div>
+    </div>
         @else
-            <div class="empty-state">
-                <i class="fas fa-shopping-cart"></i>
-                <h4 class="text-muted mb-3">لا توجد مبيعات بعد</h4>
-                <p class="text-muted mb-4">ابدأ ببيع عطورك الأولى</p>
-            </div>
+    <div class="text-center py-12">
+        <i class="fas fa-shopping-cart text-6xl text-gray-400 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">لا توجد مبيعات بعد</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-6">ابدأ ببيع عطورك الأولى</p>
+    </div>
         @endif
     </div>
 </div>
@@ -216,42 +214,49 @@ document.addEventListener('DOMContentLoaded', function() {
             left: 0;
             right: 0;
             background: white;
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            z-index: 9999;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            z-index: 50;
             max-height: 300px;
             overflow-y: auto;
-            overflow-x: hidden;
-            margin-top: 8px;
-            backdrop-filter: blur(10px);
+            margin-top: 4px;
+        }
+        .dark .search-dropdown {
+            background: #374151;
+            border-color: #4b5563;
         }
         .search-dropdown::-webkit-scrollbar {
             width: 6px;
         }
         .search-dropdown::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #f3f4f6;
             border-radius: 3px;
         }
         .search-dropdown::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #9ca3af;
             border-radius: 3px;
         }
         .search-dropdown::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #5a6fe0, #6b3fb1);
+            background: #6b7280;
         }
         .search-result-item {
-            padding: 18px 20px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: linear-gradient(135deg, #ffffff, #fafbfc);
+        }
+        .dark .search-result-item {
+            border-bottom-color: #4b5563;
         }
         .search-result-item:hover {
-            background-color: #f8f9fa !important;
+            background-color: #f9fafb;
+        }
+        .dark .search-result-item:hover {
+            background-color: #4b5563;
         }
         .search-result-item:last-child {
             border-bottom: none;
@@ -288,9 +293,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             perfumeDropdown.innerHTML = results.map(perfume => `
                 <div class="search-result-item" data-perfume-id="${perfume.id}" data-perfume-name="${perfume.name}">
-                    <div class="fw-bold text-dark" style="font-size: 1rem; color: #2c3e50;">${perfume.name}</div>
-                    <span class="badge bg-info px-4 py-2" style="border-radius: 20px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);">
-                        <i class="fas fa-tag me-2"></i>${perfume.category}
+                    <div class="font-medium text-gray-900 dark:text-white">${perfume.name}</div>
+                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        ${perfume.category}
                     </span>
                 </div>
             `).join('');
@@ -366,20 +371,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        priceDisplay.innerHTML = '<span class="text-danger">السعر غير محدد لهذا العطر والحجم</span>';
+                        priceDisplay.innerHTML = '<i class="fas fa-exclamation-triangle ml-2 text-red-600"></i><span class="text-red-600">السعر غير محدد لهذا العطر والحجم</span>';
                         sellBtn.disabled = true;
                     } else {
                         const price = customerType === 'vip' ? data.vip : data.regular;
-                        priceDisplay.innerHTML = `<strong>${price} دينار</strong>`;
+                        priceDisplay.innerHTML = `<i class="fas fa-tag ml-2 text-green-600"></i><span class="text-green-800 dark:text-green-200 font-semibold">${price} دينار</span>`;
                         sellBtn.disabled = false;
                     }
                 })
                 .catch(error => {
-                    priceDisplay.innerHTML = '<span class="text-danger">خطأ في جلب السعر</span>';
+                    priceDisplay.innerHTML = '<i class="fas fa-exclamation-triangle ml-2 text-red-600"></i><span class="text-red-600">خطأ في جلب السعر</span>';
                     sellBtn.disabled = true;
                 });
         } else {
-            priceDisplay.innerHTML = 'اختر العطر والحجم ونوع العميل لعرض السعر';
+            priceDisplay.innerHTML = '<i class="fas fa-info-circle ml-2 text-blue-600"></i><span class="text-blue-800 dark:text-blue-200 text-sm">اختر العطر والحجم ونوع العميل</span>';
             sellBtn.disabled = true;
         }
     }
@@ -456,25 +461,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<style>
-/* Lightly increase row spacing and font size for this table */
-.table-modern tbody td {
-    padding: 22px 18px; /* more space between rows */
-    font-size: 0.95rem; /* slightly larger text */
-    line-height: 1.5;
-}
-.table-modern thead th {
-    font-size: 0.95rem;
-}
 
-/* Table Row Styling */
-.table-modern tbody tr {
-    background-color: #ffffff;
-    transition: background-color 0.2s ease;
-}
-
-.table-modern tbody tr:hover >*{
-    background-color: #f5f5f5;
-}
-</style>
 @endsection

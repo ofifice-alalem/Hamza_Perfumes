@@ -13,6 +13,11 @@ class Perfume extends Model
     {
         return $this->hasMany(PerfumePrice::class);
     }
+    
+    public function perfumePrices(): HasMany
+    {
+        return $this->hasMany(PerfumePrice::class);
+    }
 
     public function sales(): HasMany
     {

@@ -1,141 +1,149 @@
 @extends('layouts.app')
 
 @section('title', 'لوحة التحكم')
+@section('page-title', 'لوحة التحكم')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="flex justify-between items-center mb-6">
     <div>
-        <h2 class="mb-1"><i class="fas fa-tachometer-alt me-2 text-primary"></i>لوحة التحكم</h2>
-        <p class="text-muted mb-0">نظرة شاملة على العطور والمبيعات</p>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <i class="fas fa-tachometer-alt ml-2 text-blue-600"></i>لوحة التحكم
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300">نظرة شاملة على العطور والمبيعات</p>
     </div>
 </div>
 
-<!-- تحليل المبيعات -->
-        <!-- فلاتر المبيعات -->
-        <div class="card-modern mb-4">
-            <div class="card-body p-4">
-                <form id="salesFilters" class="row g-3">
-                    <div class="col">
-                        <label class="form-label fw-semibold">من تاريخ</label>
-                        <input type="date" class="form-control" id="date_from" name="date_from" style="border-radius: 10px;">
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">إلى تاريخ</label>
-                        <input type="date" class="form-control" id="date_to" name="date_to" style="border-radius: 10px;">
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">نوع العميل</label>
-                        <select class="form-select" id="customer_type" name="customer_type" style="border-radius: 10px;">
-                            <option value="">الكل</option>
-                            <option value="regular">عادي</option>
-                            <option value="vip">VIP</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">الصنف</label>
-                        <select class="form-select" id="category_id" name="category_id" style="border-radius: 10px;">
-                            <option value="">جميع الأصناف</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                            <option value="uncategorized">غير مصنف</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">البائع</label>
-                        <select class="form-select" id="user_id" name="user_id" style="border-radius: 10px;">
-                            <option value="">جميع البائعين</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col">
-                        <label class="form-label fw-semibold">ترتيب حسب</label>
-                        <select class="form-select" id="sort_by" name="sort_by" style="border-radius: 10px;">
-                            <option value="sales_count">عدد المبيعات</option>
-                            <option value="total_amount">إجمالي المبلغ</option>
-                            <option value="total_ml">إجمالي الكمية (مل)</option>
-                        </select>
-                    </div>
-                </form>
+<!-- فلاتر المبيعات -->
+<div class="card mb-6">
+    <div class="card-body">
+        <form id="salesFilters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div>
+                <label class="form-label">من تاريخ</label>
+                <input type="date" class="form-input" id="date_from" name="date_from">
             </div>
-        </div>
+            <div>
+                <label class="form-label">إلى تاريخ</label>
+                <input type="date" class="form-input" id="date_to" name="date_to">
+            </div>
+            <div>
+                <label class="form-label">نوع العميل</label>
+                <select class="form-select" id="customer_type" name="customer_type">
+                    <option value="">الكل</option>
+                    <option value="regular">عادي</option>
+                    <option value="vip">VIP</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">الصنف</label>
+                <select class="form-select" id="category_id" name="category_id">
+                    <option value="">جميع الأصناف</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    @endforeach
+                    <option value="uncategorized">غير مصنف</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">البائع</label>
+                <select class="form-select" id="user_id" name="user_id">
+                    <option value="">جميع البائعين</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="form-label">ترتيب حسب</label>
+                <select class="form-select" id="sort_by" name="sort_by">
+                    <option value="sales_count">عدد المبيعات</option>
+                    <option value="total_amount">إجمالي المبلغ</option>
+                    <option value="total_ml">إجمالي الكمية (مل)</option>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
 
-        <!-- إحصائيات سريعة -->
-        <div class="row mb-4" id="salesStats">
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #28a745, #20c997);">
-                    <div class="stats-number" id="totalSales">0</div>
-                    <div class="stats-label">إجمالي المبيعات</div>
-                    <div class="stats-sublabel">دينار</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #17a2b8, #6f42c1);">
-                    <div class="stats-number" id="totalCustomers">0</div>
-                    <div class="stats-label">عدد العملاء</div>
-                    <div class="stats-sublabel">عميل</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #ff6b35, #f7931e);">
-                    <div class="stats-number" id="totalML">0</div>
-                    <div class="stats-label">إجمالي الكمية</div>
-                    <div class="stats-sublabel">مل</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card" style="background: linear-gradient(135deg, #667eea, #764ba2);">
-                    <div class="stats-number" id="avgSale">0</div>
-                    <div class="stats-label">متوسط البيع</div>
-                    <div class="stats-sublabel">دينار</div>
-                </div>
-            </div>
-        </div>
+<!-- إحصائيات سريعة -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6" id="salesStats">
+    <div class="stats-card bg-gradient-to-r from-green-500 to-emerald-500">
+        <div class="stats-value" id="totalSales">0</div>
+        <div class="stats-title">إجمالي المبيعات</div>
+        <div class="stats-change">دينار</div>
+    </div>
+    <div class="stats-card bg-gradient-to-r from-blue-500 to-purple-600">
+        <div class="stats-value" id="totalCustomers">0</div>
+        <div class="stats-title">عدد العملاء</div>
+        <div class="stats-change">عميل</div>
+    </div>
+    <div class="stats-card bg-gradient-to-r from-orange-500 to-red-500">
+        <div class="stats-value" id="totalML">0</div>
+        <div class="stats-title">إجمالي الكمية</div>
+        <div class="stats-change">مل</div>
+    </div>
+    <div class="stats-card bg-gradient-to-r from-indigo-500 to-purple-600">
+        <div class="stats-value" id="avgSale">0</div>
+        <div class="stats-title">متوسط البيع</div>
+        <div class="stats-change">دينار</div>
+    </div>
+</div>
 
-        <!-- جدول المبيعات -->
-        <div class="card-modern">
-            <div class="card-header d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 15px 15px 0 0; padding: 20px;">
-                <h5 class="mb-0 fw-bold"><i class="fas fa-chart-bar me-2"></i>تحليل المبيعات حسب العطر</h5>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="badge" style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px;" id="resultsCount">0 نتيجة</span>
-                    <div class="dropdown">
-                        <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border-radius: 20px; padding: 8px 16px; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                            <i class="fas fa-download me-2"></i>تصدير
-                        </button>
-                        <ul class="dropdown-menu" style="border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: none; padding: 10px 0;">
-                            <li><a class="dropdown-item text-center gap-2 d-flex align-items-center justify-content-center" href="#" onclick="exportData('csv')" style="padding: 12px 20px; border-radius: 10px; margin: 2px 8px; transition: all 0.3s; color: #495057;"><i class="fas fa-file-csv me-4 text-success"></i>CSV</a></li>
-                            <li><hr class="dropdown-divider" style="margin: 4px 16px; border-color: rgba(0,0,0,0.08);"></li>
-                            <li><a class="dropdown-item text-center gap-2 d-flex align-items-center justify-content-center" href="#" onclick="exportData('json')" style="padding: 12px 20px; border-radius: 10px; margin: 2px 8px; transition: all 0.3s; color: #495057;"><i class="fas fa-file-code me-4 text-primary"></i>JSON</a></li>
-                            <li><hr class="dropdown-divider" style="margin: 4px 16px; border-color: rgba(0,0,0,0.08);"></li>
-                            <li><a class="dropdown-item text-center gap-2 d-flex align-items-center justify-content-center" href="#" onclick="exportData('xml')" style="padding: 12px 20px; border-radius: 10px; margin: 2px 8px; transition: all 0.3s; color: #495057;"><i class="fas fa-file-code me-4 text-warning"></i>XML</a></li>
-                        </ul>
+<!-- جدول المبيعات -->
+<div class="card">
+    <div class="card-header bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+        <div class="flex justify-between items-center">
+            <h5 class="text-lg font-bold">
+                <i class="fas fa-chart-bar ml-2"></i>تحليل المبيعات حسب العطر
+            </h5>
+            <div class="flex items-center gap-3">
+                <span class="bg-white/20 px-4 py-2 rounded-full text-sm font-medium" id="resultsCount">0 نتيجة</span>
+                <div class="relative">
+                    <button id="exportButton" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors" onclick="toggleExportMenu()">
+                        <i class="fas fa-download ml-2"></i>تصدير
+                    </button>
+                    <div id="exportMenu" class="hidden absolute left-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50 border border-gray-200 dark:border-gray-600">
+                        <a href="#" onclick="exportData('csv')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-t-lg transition-colors">
+                            <i class="fas fa-file-csv ml-3 text-green-500"></i>CSV
+                        </a>
+                        <hr class="border-gray-200 dark:border-gray-600">
+                        <a href="#" onclick="exportData('json')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-file-code ml-3 text-blue-500"></i>JSON
+                        </a>
+                        <hr class="border-gray-200 dark:border-gray-600">
+                        <a href="#" onclick="exportData('xml')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-b-lg transition-colors">
+                            <i class="fas fa-file-code ml-3 text-yellow-500"></i>XML
+                        </a>
+                        <hr class="border-gray-200 dark:border-gray-600">
+                        <a href="#" onclick="exportData('excel')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-b-lg transition-colors">
+                            <i class="fas fa-file-excel ml-3 text-green-600"></i>Excel
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-modern mb-0" id="salesTable">
-                        <thead>
-                            <tr>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center; background: #f8f9fa;">#</th>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; background: #f8f9fa;">العطر</th>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center; background: #f8f9fa;">الصنف</th>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center; background: #f8f9fa;">عدد المبيعات</th>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center; background: #f8f9fa;">الزبائن العاديين</th>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center; background: #f8f9fa;">VIP</th>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center; background: #f8f9fa;">إجمالي الكمية</th>
-                                <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center; background: #f8f9fa;">إجمالي المبلغ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="salesTableBody">
-                            <!-- سيتم تحميل البيانات بـ JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="overflow-x-auto">
+            <table class="table" id="salesTable">
+                <thead class="bg-gray-50 dark:bg-gray-600">
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th>العطر</th>
+                        <th class="text-center">الصنف</th>
+                        <th class="text-center">عدد المبيعات</th>
+                        <th class="text-center">الزبائن العاديين</th>
+                        <th class="text-center">VIP</th>
+                        <th class="text-center">إجمالي الكمية</th>
+                        <th class="text-center">إجمالي المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <!-- سيتم تحميل البيانات بـ JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -148,13 +156,67 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // تصدير البيانات
-    window.exportData = function(format) {
+    window.exportData = function(format, event) {
+        event?.preventDefault();
+        
         const formData = new FormData(document.getElementById('salesFilters'));
         formData.append('format', format);
         const params = new URLSearchParams(formData);
         
-        window.location.href = `/api/export-sales-analytics?${params}`;
+        // إظهار رسالة تحميل
+        const button = document.getElementById('exportButton');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i>جاري التصدير...';
+        button.disabled = true;
+        
+        // محاولة التصدير
+        try {
+            window.location.href = `/api/export-sales-analytics?${params}`;
+        } catch (error) {
+            console.error('خطأ في التصدير:', error);
+            alert('حدث خطأ أثناء التصدير');
+        }
+        
+        // إعادة تعيين الزر بعد ثانيتين
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }, 2000);
+        
+        // إغلاق القائمة
+        document.getElementById('exportMenu').classList.add('hidden');
     };
+    
+    // تبديل قائمة التصدير
+    window.toggleExportMenu = function(event) {
+        event?.stopPropagation();
+        const menu = document.getElementById('exportMenu');
+        const isHidden = menu.classList.contains('hidden');
+        
+        if (isHidden) {
+            menu.classList.remove('hidden');
+            menu.style.animation = 'fadeInDown 0.2s ease';
+        } else {
+            menu.classList.add('hidden');
+        }
+    };
+    
+    // إغلاق قائمة التصدير عند النقر خارجها
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('exportMenu');
+        const button = document.getElementById('exportButton');
+        
+        if (!menu.contains(event.target) && !button.contains(event.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+    
+    // إغلاق القائمة بمفتاح Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            document.getElementById('exportMenu').classList.add('hidden');
+        }
+    });
     
     // إضافة pagination بسيطة
     let currentPage = 1;
@@ -168,17 +230,17 @@ document.addEventListener('DOMContentLoaded', function() {
         let paginationHtml = '';
         
         if (totalPages > 1) {
-            paginationHtml = '<div class="pagination-container d-flex justify-content-center my-3"><div class="d-flex gap-2 align-items-center">';
+            paginationHtml = '<div class="pagination-container flex justify-center my-6"><div class="flex gap-2 items-center">';
             
             // زر الصفحة الأولى
             const firstDisabled = currentPage === 1;
-            const firstClass = firstDisabled ? 'btn-secondary' : 'btn-outline-primary';
-            paginationHtml += `<button class="btn btn-sm ${firstClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(1)" ${firstDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-right"></i></button>`;
+            const firstClass = firstDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
+            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${firstClass} transition-colors" onclick="loadPage(1)" ${firstDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-right"></i></button>`;
             
             // زر السابق
             const prevDisabled = currentPage === 1;
-            const prevClass = prevDisabled ? 'btn-secondary' : 'btn-primary';
-            paginationHtml += `<button class="btn btn-sm ${prevClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+            const prevClass = prevDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
+            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${prevClass} transition-colors" onclick="loadPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
             
             // أرقام الصفحات
             const startPage = Math.max(1, currentPage - 2);
@@ -186,19 +248,19 @@ document.addEventListener('DOMContentLoaded', function() {
             
             for (let i = startPage; i <= endPage; i++) {
                 const isActive = i === currentPage;
-                const btnClass = isActive ? 'btn-warning' : 'btn-outline-primary';
-                paginationHtml += `<button class="btn btn-sm ${btnClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%; font-weight: 600;" onclick="loadPage(${i})">${i}</button>`;
+                const btnClass = isActive ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50';
+                paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${btnClass} transition-colors font-semibold" onclick="loadPage(${i})">${i}</button>`;
             }
             
             // زر التالي
             const nextDisabled = currentPage === totalPages;
-            const nextClass = nextDisabled ? 'btn-secondary' : 'btn-primary';
-            paginationHtml += `<button class="btn btn-sm ${nextClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+            const nextClass = nextDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
+            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${nextClass} transition-colors" onclick="loadPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
             
             // زر الصفحة الأخيرة
             const lastDisabled = currentPage === totalPages;
-            const lastClass = lastDisabled ? 'btn-secondary' : 'btn-outline-primary';
-            paginationHtml += `<button class="btn btn-sm ${lastClass} d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 50%;" onclick="loadPage(${totalPages})" ${lastDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-left"></i></button>`;
+            const lastClass = lastDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
+            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${lastClass} transition-colors" onclick="loadPage(${totalPages})" ${lastDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-left"></i></button>`;
             
             paginationHtml += '</div></div>';
         }
@@ -233,47 +295,47 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.perfumes.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <div class="empty-state-mini">
-                                <i class="fas fa-chart-line text-muted mb-3" style="font-size: 3rem;"></i>
-                                <h5 class="text-muted">لا توجد مبيعات</h5>
-                                <p class="text-muted mb-0">لا توجد مبيعات تطابق الفلاتر المحددة</p>
+                        <td colspan="8" class="text-center py-12">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-chart-line text-gray-400 text-5xl mb-4"></i>
+                                <h5 class="text-gray-500 text-lg font-semibold mb-2">لا توجد مبيعات</h5>
+                                <p class="text-gray-400">لا توجد مبيعات تطابق الفلاتر المحددة</p>
                             </div>
                         </td>
                     </tr>
                 `;
             } else {
                 tbody.innerHTML = data.perfumes.map((perfume, index) => `
-                    <tr style="transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
-                        <td class="fw-bold text-center" style="padding: 20px 15px; font-size: 0.95rem;">${index + 1}</td>
-                        <td style="padding: 20px 15px;">
-                            <span class="fw-semibold" style="font-size: 1rem;">${perfume.name}</span>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                        <td class="text-center font-bold">${index + 1}</td>
+                        <td>
+                            <span class="font-semibold text-gray-900 dark:text-gray-100">${perfume.name}</span>
                         </td>
-                        <td class="text-center" style="padding: 20px 15px;">
-                            <span class="badge bg-secondary px-2 py-1" style="border-radius: 10px; font-size: 0.8rem;">
+                        <td class="text-center">
+                            <span class="inline-block bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-full text-sm">
                                 ${perfume.category_name || 'غير مصنف'}
                             </span>
                         </td>
-                        <td class="text-center" style="padding: 20px 15px;">
-                            <span class="badge px-3 py-2" style="border-radius: 15px; background: linear-gradient(135deg, #28a745, #20c997); color: white; font-weight: 600; font-size: 0.9rem;">
+                        <td class="text-center">
+                            <span class="inline-block bg-green-500 text-white px-3 py-2 rounded-full font-semibold">
                                 ${perfume.sales_count}
                             </span>
                         </td>
-                        <td class="text-center" style="padding: 20px 15px;">
-                            <div class="fw-semibold text-primary" style="font-size: 1.1rem;">${perfume.regular_count}</div>
-                            <div class="text-muted small">عميل</div>
+                        <td class="text-center">
+                            <div class="font-semibold text-blue-600 dark:text-blue-400 text-lg">${perfume.regular_count}</div>
+                            <div class="text-gray-500 text-sm">عميل</div>
                         </td>
-                        <td class="text-center" style="padding: 20px 15px;">
-                            <div class="fw-semibold text-warning" style="font-size: 1.1rem;">${perfume.vip_count}</div>
-                            <div class="text-muted small">عميل</div>
+                        <td class="text-center">
+                            <div class="font-semibold text-yellow-600 dark:text-yellow-400 text-lg">${perfume.vip_count}</div>
+                            <div class="text-gray-500 text-sm">عميل</div>
                         </td>
-                        <td class="text-center" style="padding: 20px 15px;">
-                            <div class="fw-semibold text-info" style="font-size: 1.1rem;">${perfume.total_ml.toLocaleString()}</div>
-                            <div class="text-muted small">مل</div>
+                        <td class="text-center">
+                            <div class="font-semibold text-cyan-600 dark:text-cyan-400 text-lg">${perfume.total_ml.toLocaleString()}</div>
+                            <div class="text-gray-500 text-sm">مل</div>
                         </td>
-                        <td class="text-center" style="padding: 20px 15px;">
-                            <div class="fw-bold text-success" style="font-size: 1.1rem;">${perfume.total_amount.toLocaleString()}</div>
-                            <div class="text-muted small">دينار</div>
+                        <td class="text-center">
+                            <div class="font-bold text-green-600 dark:text-green-400 text-lg">${perfume.total_amount.toLocaleString()}</div>
+                            <div class="text-gray-500 text-sm">دينار</div>
                         </td>
                     </tr>
                 `).join('');
@@ -290,85 +352,38 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-.nav-pills .nav-link {
-    border-radius: 25px;
-    padding: 12px 24px;
-    font-weight: 600;
-    transition: all 0.3s;
-    border: 2px solid transparent;
+/* تحسينات إضافية للتصميم */
+.stats-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.nav-pills .nav-link:not(.active) {
-    color: #6c757d;
-    background: #f8f9fa;
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-.nav-pills .nav-link.active {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-color: transparent;
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.nav-pills .nav-link:hover:not(.active) {
-    background: #e9ecef;
+.card:hover {
     transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.category-icon {
-    transition: transform 0.3s ease;
+#exportMenu {
+    animation: fadeInDown 0.2s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-.card-modern:hover .category-icon {
-    transform: scale(1.1);
+#exportMenu a:hover {
+    transform: translateX(2px);
 }
 
-.perfume-item {
-    padding: 8px 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.perfume-item:last-child {
-    border-bottom: none;
-}
-
-.empty-state-mini {
-    padding: 40px 20px;
-}
-
-.perfume-icon {
-    transition: transform 0.3s ease;
-}
-
-.perfume-icon:hover {
-    transform: scale(1.1);
-}
-
-#salesTable tbody tr {
-    border-bottom: 1px solid #f0f0f0;
-}
-
-#salesTable tbody tr:last-child {
-    border-bottom: none;
-}
-
-#salesTable tbody tr:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transform: translateY(-1px);
-}
-
-.dropdown-item:hover {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
-    transform: translateX(5px) !important;
-    color: #495057 !important;
-}
-
-.dropdown-menu {
-    animation: fadeInUp 0.3s ease;
-}
-
-@keyframes fadeInUp {
+@keyframes fadeInDown {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
@@ -376,21 +391,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
 
-.pagination .page-link {
-    border: none;
-    margin: 0 2px;
-    transition: all 0.3s ease;
+.pagination-container {
+    animation: fadeInUp 0.3s ease;
 }
 
-.pagination .page-link:hover:not(.active) {
-    background: #f8f9fa;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.pagination .page-item.disabled .page-link {
-    opacity: 0.5;
-    cursor: not-allowed;
+/* تحسين الجدول للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .table th,
+    .table td {
+        padding: 8px 4px;
+        font-size: 0.875rem;
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
 }
 </style>
 @endsection

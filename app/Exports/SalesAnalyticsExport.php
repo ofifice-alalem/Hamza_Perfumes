@@ -27,6 +27,13 @@ class SalesAnalyticsExport
             
             fwrite($file, "\xEF\xBB\xBF");
             
+            // معلومات التقرير
+            fputcsv($file, ['تقرير المبيعات']);
+            fputcsv($file, ['تاريخ التقرير', now()->format('Y-m-d H:i:s')]);
+            fputcsv($file, ['البداية', $this->filters['date_from'] ?? 'غير محدد']);
+            fputcsv($file, ['النهاية', $this->filters['date_to'] ?? 'غير محدد']);
+            fputcsv($file, []);
+            
             // الإحصائيات
             fputcsv($file, ['الإحصائيات']);
             fputcsv($file, ['إجمالي المبيعات', number_format($this->data['stats']['total_sales'], 2)]);
@@ -34,6 +41,21 @@ class SalesAnalyticsExport
             fputcsv($file, ['إجمالي الكمية', number_format($this->data['stats']['total_ml'])]);
             fputcsv($file, ['متوسط البيع', number_format($this->data['stats']['avg_sale'], 2)]);
             fputcsv($file, []);
+            
+            // إحصائيات البائعين
+            if (isset($this->data['sellers']) && count($this->data['sellers']) > 0) {
+                fputcsv($file, ['البائعين']);
+                fputcsv($file, ['اسم البائع', 'عدد المبيعات', 'إجمالي المبلغ', 'متوسط البيع']);
+                foreach ($this->data['sellers'] as $seller) {
+                    fputcsv($file, [
+                        $seller['name'],
+                        $seller['sales_count'],
+                        number_format($seller['total_amount'], 2),
+                        number_format($seller['avg_sale'], 2)
+                    ]);
+                }
+                fputcsv($file, []);
+            }
             
             // تحليل المبيعات
             fputcsv($file, ['تحليل المبيعات']);
@@ -72,8 +94,14 @@ class SalesAnalyticsExport
         $filename = 'تحليل_المبيعات_' . now()->format('Y-m-d_H-i-s') . '.json';
         
         $data = [
+            'report_info' => [
+                'report_date' => now()->format('Y-m-d H:i:s'),
+                'start_date' => $this->filters['date_from'] ?? 'غير محدد',
+                'end_date' => $this->filters['date_to'] ?? 'غير محدد'
+            ],
             'stats' => $this->data['stats'],
-            'perfumes' => $this->data['perfumes']
+            'perfumes' => $this->data['perfumes'],
+            'sellers' => $this->data['sellers'] ?? []
         ];
         
         return response()->json($data)
@@ -86,11 +114,29 @@ class SalesAnalyticsExport
         
         $xml = new \SimpleXMLElement('<sales_analytics/>');
         
+        // معلومات التقرير
+        $reportInfo = $xml->addChild('report_info');
+        $reportInfo->addChild('report_date', now()->format('Y-m-d H:i:s'));
+        $reportInfo->addChild('start_date', $this->filters['date_from'] ?? 'غير محدد');
+        $reportInfo->addChild('end_date', $this->filters['date_to'] ?? 'غير محدد');
+        
         $stats = $xml->addChild('stats');
         $stats->addChild('total_sales', $this->data['stats']['total_sales']);
         $stats->addChild('total_customers', $this->data['stats']['total_customers']);
         $stats->addChild('total_ml', $this->data['stats']['total_ml']);
         $stats->addChild('avg_sale', $this->data['stats']['avg_sale']);
+        
+        // إضافة إحصائيات البائعين
+        if (isset($this->data['sellers']) && count($this->data['sellers']) > 0) {
+            $sellers = $xml->addChild('sellers');
+            foreach ($this->data['sellers'] as $seller) {
+                $sellerNode = $sellers->addChild('seller');
+                $sellerNode->addChild('name', htmlspecialchars($seller['name']));
+                $sellerNode->addChild('sales_count', $seller['sales_count']);
+                $sellerNode->addChild('total_amount', $seller['total_amount']);
+                $sellerNode->addChild('avg_sale', $seller['avg_sale']);
+            }
+        }
         
         $perfumes = $xml->addChild('perfumes');
         foreach ($this->data['perfumes'] as $perfume) {
