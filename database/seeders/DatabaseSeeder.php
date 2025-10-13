@@ -13,14 +13,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run()
     {
-        // مسح البيانات الموجودة
-        Sale::query()->delete();
-        PerfumePrice::query()->delete();
-        \App\Models\CategoryPrice::query()->delete();
-        Perfume::query()->delete();
-        Category::query()->delete();
-        Size::query()->delete();
-        \App\Models\User::query()->delete();
+        $this->call(UserSeeder::class);
 
         // إنشاء الأحجام
         $sizes = [
@@ -101,22 +94,7 @@ class DatabaseSeeder extends Seeder
         $perfumeIds = Perfume::pluck('id')->toArray();
         $customerTypes = ['regular', 'vip'];
 
-        // إنشاء مستخدمين super-admin
-        \App\Models\User::create([
-            'name' => 'Super Admin',
-            'username' => 'admin',
-            'email' => 'admin@system.local',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'),
-            'role' => 'super-admin'
-        ]);
-        
-        \App\Models\User::create([
-            'name' => 'Boraq Admin',
-            'username' => 'boraq',
-            'email' => 'boraq@system.local',
-            'password' => \Illuminate\Support\Facades\Hash::make('12255'),
-            'role' => 'super-admin'
-        ]);
+        $userIds = \App\Models\User::pluck('id')->toArray();
 
         for ($i = 1; $i <= 1200; $i++) {
             $perfumeId = $perfumeIds[array_rand($perfumeIds)];
@@ -140,6 +118,7 @@ class DatabaseSeeder extends Seeder
             }
 
             Sale::create([
+                'user_id' => $userIds[array_rand($userIds)],
                 'perfume_id' => $perfumeId,
                 'size_id' => $sizeId,
                 'customer_type' => $customerType,

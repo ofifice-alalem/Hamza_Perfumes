@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Perfume;
 use App\Models\Sale;
 use App\Models\Size;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -16,8 +17,9 @@ class DashboardController extends Controller
     {
         $categories = Category::with('perfumes')->get();
         $uncategorizedPerfumes = Perfume::whereNull('category_id')->get();
+        $users = User::all();
         
-        return view('dashboard', compact('categories', 'uncategorizedPerfumes'));
+        return view('dashboard', compact('categories', 'uncategorizedPerfumes', 'users'));
     }
     
     public function getSalesAnalytics(Request $request)
@@ -46,7 +48,7 @@ class DashboardController extends Controller
     
     private function getSalesData(Request $request, $paginate = false)
     {
-        $query = Sale::with(['perfume.category', 'size']);
+        $query = Sale::with(['perfume.category', 'size', 'user']);
         
         if ($request->date_from) {
             $query->whereDate('created_at', '>=', $request->date_from);
@@ -72,6 +74,10 @@ class DashboardController extends Controller
             }
         }
         
+        if ($request->user_id) {
+            $query->where('user_id', $request->user_id);
+        }
+        
         $sales = $query->get();
         
         $stats = [
@@ -80,6 +86,17 @@ class DashboardController extends Controller
             'total_ml' => $this->calculateTotalML($sales),
             'avg_sale' => $sales->count() > 0 ? $sales->avg('price') : 0
         ];
+        
+        // إحصائيات البائعين
+        $sellerStats = $sales->groupBy('user_id')->map(function ($sellerSales) {
+            $user = $sellerSales->first()->user;
+            return [
+                'name' => $user ? $user->name : 'غير محدد',
+                'sales_count' => $sellerSales->count(),
+                'total_amount' => $sellerSales->sum('price'),
+                'avg_sale' => $sellerSales->avg('price')
+            ];
+        })->sortByDesc('total_amount')->values();
         
         $perfumeStats = $sales->groupBy('perfume_id')->map(function ($perfumeSales) {
             $perfume = $perfumeSales->first()->perfume;
@@ -110,6 +127,7 @@ class DashboardController extends Controller
         return [
             'stats' => $stats,
             'perfumes' => $perfumeStats,
+            'sellers' => $sellerStats,
             'total_count' => $totalCount
         ];
     }

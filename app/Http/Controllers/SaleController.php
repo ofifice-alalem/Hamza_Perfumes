@@ -15,7 +15,7 @@ class SaleController extends Controller
     {
         $perfumes = Perfume::all();
         $sizes = Size::all();
-        $sales = Sale::with(['perfume', 'size'])->whereDate('created_at', today())->latest()->get();
+        $sales = Sale::with(['perfume', 'size', 'user'])->whereDate('created_at', today())->latest()->get();
         
         $showStats = !auth()->user()->isSaler();
         
@@ -90,6 +90,7 @@ class SaleController extends Controller
         }
 
         Sale::create([
+            'user_id' => auth()->id(),
             'perfume_id' => $request->perfume_id,
             'size_id' => $request->size_id,
             'customer_type' => $request->customer_type,

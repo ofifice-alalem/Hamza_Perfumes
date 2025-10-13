@@ -117,6 +117,7 @@
                                     <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">العطر</th>
                                     <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">الحجم</th>
                                     <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">نوع العميل</th>
+                                    <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">البائع</th>
                                     <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">السعر</th>
                                     <th class="border-0" style="padding: 20px 15px; font-size: 0.9rem; font-weight: 600; text-align: center;">التاريخ</th>
                                 </tr>
@@ -152,6 +153,17 @@
                                             <i class="fas {{ $sale->customer_type === 'vip' ? 'fa-crown' : 'fa-user' }} me-1"></i>
                                             {{ $sale->customer_type === 'vip' ? 'VIP' : 'عادي' }}
                                         </span>
+                                    </td>
+                                    <td style="padding: 20px 15px; text-align: center;">
+                                        @if($sale->user)
+                                            <span class="badge px-3 py-2" style="border-radius: 15px; background:#f0f8ff; color:#0066cc; font-weight:600;">
+                                                <i class="fas fa-user-tie me-1"></i>{{ $sale->user->name }}
+                                            </span>
+                                        @else
+                                            <span class="badge px-3 py-2" style="border-radius: 15px; background:#f8f9fa; color:#6c757d; font-weight:600;">
+                                                <i class="fas fa-question me-1"></i>غير محدد
+                                            </span>
+                                        @endif
                                     </td>
                                     <td style="padding: 20px 15px; text-align: center;">
                                         <span class="badge px-3 py-2" style="border-radius: 15px; background:#e8f5e8; color:#28a745; font-weight:600;">

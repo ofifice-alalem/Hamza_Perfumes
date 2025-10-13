@@ -8,6 +8,7 @@ use App\Models\Perfume;
 use App\Models\Size;
 use App\Models\PerfumePrice;
 use App\Models\CategoryPrice;
+use App\Models\User;
 
 class SalesSeeder extends Seeder
 {
@@ -15,16 +16,18 @@ class SalesSeeder extends Seeder
     {
         $perfumes = Perfume::all();
         $sizes = Size::all();
+        $users = User::all();
         $customerTypes = ['regular', 'vip'];
         
-        if ($perfumes->isEmpty() || $sizes->isEmpty()) {
-            $this->command->info('لا توجد عطور أو أحجام لإنشاء مبيعات');
+        if ($perfumes->isEmpty() || $sizes->isEmpty() || $users->isEmpty()) {
+            $this->command->info('لا توجد عطور أو أحجام أو مستخدمين لإنشاء مبيعات');
             return;
         }
 
         for ($i = 0; $i < 50; $i++) {
             $perfume = $perfumes->random();
             $size = $sizes->random();
+            $user = $users->random();
             $customerType = $customerTypes[array_rand($customerTypes)];
             $isFullBottle = rand(0, 100) < 20; // 20% احتمال عبوة كاملة
             
@@ -33,6 +36,7 @@ class SalesSeeder extends Seeder
             
             if ($price) {
                 Sale::create([
+                    'user_id' => $user->id,
                     'perfume_id' => $perfume->id,
                     'size_id' => $size->id,
                     'customer_type' => $customerType,

@@ -42,6 +42,15 @@
                         </select>
                     </div>
                     <div class="col">
+                        <label class="form-label fw-semibold">البائع</label>
+                        <select class="form-select" id="user_id" name="user_id" style="border-radius: 10px;">
+                            <option value="">جميع البائعين</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col">
                         <label class="form-label fw-semibold">ترتيب حسب</label>
                         <select class="form-select" id="sort_by" name="sort_by" style="border-radius: 10px;">
                             <option value="sales_count">عدد المبيعات</option>
