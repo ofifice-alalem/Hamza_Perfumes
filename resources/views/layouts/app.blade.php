@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'حمزة عطور - نظام إدارة العطور')</title>
+    <title>@yield('title', 'عطر التاجوري - نظام إدارة العطور')</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -142,47 +142,47 @@
         <!-- Sidebar -->
         <div class="fixed inset-y-0 right-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full" id="sidebar">
             <div class="flex items-center justify-center h-16 bg-gradient-to-r from-blue-500 to-blue-600">
-                <h1 class="text-white text-xl font-bold">حمزة عطور</h1>
+                <h1 class="text-white text-xl font-bold">عطر التاجوري</h1>
             </div>
             
             <nav class="mt-8 px-4">
                 <div class="space-y-2">
                     @if(auth()->user()->role === 'super-admin')
                         <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <i class="fas fa-chart-line mr-3"></i>
+                            <img src="{{ asset('images/dashboard.png') }}" alt="لوحة التحكم" class="w-6 h-6 mr-3 object-contain">
                             <span>لوحة التحكم</span>
                         </a>
                         
                         <a href="{{ route('users.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('users.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <i class="fas fa-users mr-3"></i>
+                            <img src="{{ asset('images/users.png') }}" alt="المستخدمين" class="w-6 h-6 mr-3 object-contain">
                             <span>المستخدمين</span>
                         </a>
                     @endif
                     
                     @if(in_array(auth()->user()->role, ['super-admin', 'admin']))
                         <a href="{{ route('perfumes.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('perfumes.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <i class="fas fa-spray-can mr-3"></i>
+                            <img src="{{ asset('images/perfumes.png') }}" alt="العطور" class="w-6 h-6 mr-3 object-contain">
                             <span>العطور</span>
                         </a>
                         
                         <a href="{{ route('categories.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('categories.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <i class="fas fa-tags mr-3"></i>
+                            <img src="{{ asset('images/categories.png') }}" alt="التصنيفات" class="w-6 h-6 mr-3 object-contain">
                             <span>التصنيفات</span>
                         </a>
                         
                         <a href="{{ route('sizes.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('sizes.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <i class="fas fa-ruler mr-3"></i>
+                            <img src="{{ asset('images/sizes.png') }}" alt="الأحجام" class="w-6 h-6 mr-3 object-contain">
                             <span>الأحجام</span>
                         </a>
                         
                         <a href="{{ route('prices.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('prices.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <i class="fas fa-dollar-sign mr-3"></i>
+                            <img src="{{ asset('images/prices.png') }}" alt="الأسعار" class="w-6 h-6 mr-3 object-contain">
                             <span>الأسعار</span>
                         </a>
                     @endif
                     
                     <a href="{{ route('sales.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                        <i class="fas fa-shopping-cart mr-3"></i>
+                        <img src="{{ asset('images/sales.png') }}" alt="المبيعات" class="w-6 h-6 mr-3 object-contain">
                         <span>المبيعات</span>
                     </a>
                 </div>
@@ -192,21 +192,24 @@
 
             <!-- User Info -->
             <div class="px-4 py-3 border-t border-gray-200" >
-                <div class="mb-3 p-2 border shadow-sm rounded-lg border-blue-200 border-2 bg-blue-50">
-                    <p class="text-sm font-medium text-gray-900 ">{{ auth()->user()->name }}</p>
-                    <p class="text-xs text-gray-500 ">
-                        @switch(auth()->user()->role)
-                            @case('super-admin')
-                                مدير عام
-                                @break
-                            @case('admin')
-                                مدير
-                                @break
-                            @case('saler')
-                                بائع
-                                @break
-                        @endswitch
-                    </p>
+                <div class="mb-3 p-2 border shadow-sm rounded-lg border-blue-200 border-2 bg-blue-50 flex items-center">
+                    <img src="{{ asset('images/user.png') }}" alt="المستخدم" class="w-6 h-6 mr-3 object-contain">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 ">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-500 ">
+                            @switch(auth()->user()->role)
+                                @case('super-admin')
+                                    مدير عام
+                                    @break
+                                @case('admin')
+                                    مدير
+                                    @break
+                                @case('saler')
+                                    بائع
+                                    @break
+                            @endswitch
+                        </p>
+                    </div>
                 </div>
                 
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
