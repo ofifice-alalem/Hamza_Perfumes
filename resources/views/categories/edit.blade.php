@@ -6,13 +6,13 @@
 @section('content')
 <div class="flex justify-between items-center mb-6">
     <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            <i class="fas fa-edit ml-2 text-blue-600"></i>تعديل تصنيف
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-edit mr-3 text-blue-600"></i>تعديل تصنيف
         </h2>
-        <p class="text-gray-600 dark:text-gray-300">تعديل بيانات التصنيف</p>
+        <p class="text-gray-600">تعديل بيانات التصنيف</p>
     </div>
     <a href="{{ route('categories.index') }}" class="btn-secondary">
-        <i class="fas fa-arrow-right ml-2"></i>العودة للقائمة
+        <i class="fas fa-arrow-right ml-4"></i>العودة للقائمة
     </a>
 </div>
 
@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-header bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
             <h5 class="text-lg font-bold">
-                <i class="fas fa-edit ml-2"></i>تعديل بيانات {{ $category->name }}
+                <i class="fas fa-edit mr-3"></i>تعديل بيانات {{ $category->name }}
             </h5>
         </div>
         <div class="card-body">
@@ -36,14 +36,14 @@
                     @enderror
                 </div>
 
-                <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">الأسعار حسب الأحجام</h4>
+                <h4 class="text-lg font-semibold text-gray-900 mb-4">الأسعار حسب الأحجام</h4>
                 <div class="overflow-x-auto">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>الحجم</th>
-                                <th>السعر العادي (ر.س)</th>
-                                <th>سعر VIP (ر.س)</th>
+                                <th>السعر العادي (دينار)</th>
+                                <th>سعر VIP (دينار)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,7 +53,7 @@
                             @endphp
                             <tr>
                                 <td>
-                                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
                                         {{ $size->label }}
                                     </span>
                                 </td>
@@ -85,10 +85,10 @@
                 
                 <div class="flex gap-3 mt-6">
                     <button type="submit" class="flex-1 btn-warning">
-                        <i class="fas fa-save ml-2"></i>حفظ التغييرات
+                        <i class="fas fa-save mr-3"></i>حفظ التغييرات
                     </button>
                     <a href="{{ route('categories.index') }}" class="flex-1 btn-secondary text-center">
-                        <i class="fas fa-times ml-2"></i>إلغاء
+                        <i class="fas fa-times mr-3"></i>إلغاء
                     </a>
                 </div>
             </form>

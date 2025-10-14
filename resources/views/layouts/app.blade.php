@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="html-root">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,10 +37,7 @@
         overflow-y: auto;
         margin-top: 4px;
     }
-    .dark .search-dropdown {
-        background: #374151;
-        border-color: #4b5563;
-    }
+
     .search-dropdown::-webkit-scrollbar {
         width: 6px;
     }
@@ -64,15 +61,11 @@
         align-items: center;
         justify-content: space-between;
     }
-    .dark .search-result-item {
-        border-bottom-color: #4b5563;
-    }
+
     .search-result-item:hover {
         background-color: #f9fafb;
     }
-    .dark .search-result-item:hover {
-        background-color: #4b5563;
-    }
+
     .search-result-item:last-child {
         border-bottom: none;
     }
@@ -125,14 +118,14 @@
                 globalDropdown.innerHTML = `
                     <div class="p-4 text-center">
                         <i class="fas fa-search text-gray-400 mb-2" style="font-size: 2rem;"></i>
-                        <div class="text-gray-500 dark:text-gray-400">لا توجد نتائج</div>
+                        <div class="text-gray-500">لا توجد نتائج</div>
                     </div>
                 `;
             } else {
                 globalDropdown.innerHTML = results.map(perfume => `
                     <div class="search-result-item" onclick="window.location.href='/sales?perfume_id=${perfume.id}'">
-                        <div class="font-medium text-gray-900 dark:text-white">${perfume.name}</div>
-                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        <div class="font-medium text-gray-900">${perfume.name}</div>
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
                             ${perfume.category}
                         </span>
                     </div>
@@ -143,11 +136,11 @@
     });
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-800 font-tajawal transition-colors duration-300">
+<body class="bg-gray-50 font-tajawal">
 
     @auth
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 right-0 z-40 w-64 bg-white dark:bg-gray-800 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full" id="sidebar">
+        <div class="fixed inset-y-0 right-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full" id="sidebar">
             <div class="flex items-center justify-center h-16 bg-gradient-to-r from-blue-500 to-blue-600">
                 <h1 class="text-white text-xl font-bold">حمزة عطور</h1>
             </div>
@@ -155,84 +148,71 @@
             <nav class="mt-8 px-4">
                 <div class="space-y-2">
                     @if(auth()->user()->role === 'super-admin')
-                        <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('dashboard') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
-                            <i class="fas fa-chart-line ml-3"></i>
+                        <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-blue-100 text-blue-700' : '' }}">
+                            <i class="fas fa-chart-line mr-3"></i>
                             <span>لوحة التحكم</span>
                         </a>
                         
-                        <a href="{{ route('users.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('users.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
-                            <i class="fas fa-users ml-3"></i>
+                        <a href="{{ route('users.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('users.*') ? 'bg-blue-100 text-blue-700' : '' }}">
+                            <i class="fas fa-users mr-3"></i>
                             <span>المستخدمين</span>
                         </a>
                     @endif
                     
                     @if(in_array(auth()->user()->role, ['super-admin', 'admin']))
-                        <a href="{{ route('perfumes.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('perfumes.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
-                            <i class="fas fa-spray-can ml-3"></i>
+                        <a href="{{ route('perfumes.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('perfumes.*') ? 'bg-blue-100 text-blue-700' : '' }}">
+                            <i class="fas fa-spray-can mr-3"></i>
                             <span>العطور</span>
                         </a>
                         
-                        <a href="{{ route('categories.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('categories.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
-                            <i class="fas fa-tags ml-3"></i>
+                        <a href="{{ route('categories.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('categories.*') ? 'bg-blue-100 text-blue-700' : '' }}">
+                            <i class="fas fa-tags mr-3"></i>
                             <span>التصنيفات</span>
                         </a>
                         
-                        <a href="{{ route('sizes.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('sizes.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
-                            <i class="fas fa-ruler ml-3"></i>
+                        <a href="{{ route('sizes.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('sizes.*') ? 'bg-blue-100 text-blue-700' : '' }}">
+                            <i class="fas fa-ruler mr-3"></i>
                             <span>الأحجام</span>
                         </a>
                         
-                        <a href="{{ route('prices.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('prices.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
-                            <i class="fas fa-dollar-sign ml-3"></i>
+                        <a href="{{ route('prices.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('prices.*') ? 'bg-blue-100 text-blue-700' : '' }}">
+                            <i class="fas fa-dollar-sign mr-3"></i>
                             <span>الأسعار</span>
                         </a>
                     @endif
                     
-                    <a href="{{ route('sales.index') }}" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-100 dark:bg-gray-600 text-blue-700 dark:text-blue-300' : '' }}">
-                        <i class="fas fa-shopping-cart ml-3"></i>
+                    <a href="{{ route('sales.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-100 text-blue-700' : '' }}">
+                        <i class="fas fa-shopping-cart mr-3"></i>
                         <span>المبيعات</span>
                     </a>
                 </div>
             </nav>
             
-            <!-- Dark Mode Toggle -->
-            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-                <button id="darkModeToggle" type="button" onclick="toggleDarkMode()" class="w-full flex items-center justify-center px-4 py-3 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-blue-50 dark:hover:bg-gray-600 transition-colors duration-200">
-                    <i class="fas fa-moon dark:hidden text-gray-700 ml-3"></i>
-                    <i class="fas fa-sun hidden dark:block text-yellow-500 ml-3"></i>
-                    <span class="dark:hidden">الوضع الليلي</span>
-                    <span class="hidden dark:block">الوضع النهاري</span>
-                </button>
-            </div>
+
 
             <!-- User Info -->
-            <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-                <div class="flex items-center">
-                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                        {{ substr(auth()->user()->name, 0, 1) }}
-                    </div>
-                    <div class="mr-3">
-                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-300">
-                            @switch(auth()->user()->role)
-                                @case('super-admin')
-                                    مدير عام
-                                    @break
-                                @case('admin')
-                                    مدير
-                                    @break
-                                @case('saler')
-                                    بائع
-                                    @break
-                            @endswitch
-                        </p>
-                    </div>
+            <div class="px-4 py-3 border-t border-gray-200" >
+                <div class="mb-3 p-2 border shadow-sm rounded-lg border-blue-200 border-2 bg-blue-50">
+                    <p class="text-sm font-medium text-gray-900 ">{{ auth()->user()->name }}</p>
+                    <p class="text-xs text-gray-500 ">
+                        @switch(auth()->user()->role)
+                            @case('super-admin')
+                                مدير عام
+                                @break
+                            @case('admin')
+                                مدير
+                                @break
+                            @case('saler')
+                                بائع
+                                @break
+                        @endswitch
+                    </p>
                 </div>
                 
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
                     @csrf
-                    <button type="submit" class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-sign-out-alt ml-2"></i>
+                    <button type="submit" class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
                         تسجيل الخروج
                     </button>
                 </form>
@@ -245,13 +225,13 @@
         <!-- Main Content -->
         <div class="lg:mr-64 min-h-screen transition-all duration-300">
             <!-- Top Bar -->
-            <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-600">
+            <div class="bg-white shadow-sm border-b border-gray-200">
                 <div class="flex items-center px-4 lg:px-6 py-4">
                     <div class="flex items-center">
-                        <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100 transition-colors">
+                        <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 transition-colors">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
-                        <h2 class="text-lg lg:text-xl font-semibold text-gray-900 dark:text-gray-100 mr-2 lg:mr-4">@yield('page-title', 'الصفحة الرئيسية')</h2>
+                        <h2 class="text-lg lg:text-xl font-semibold text-gray-900 mr-2 lg:mr-4">@yield('page-title', 'الصفحة الرئيسية')</h2>
                     </div>
                     
                     <!-- Search Bar - Center -->
@@ -267,33 +247,33 @@
                         </div>
                     </div>
                     
-                    <div class="text-xs lg:text-sm text-gray-500 dark:text-gray-300" id="currentDate">
+                    <div class="text-xs lg:text-sm text-gray-500" id="currentDate">
                         <!-- سيتم تحديثه بـ JavaScript -->
                     </div>
                 </div>
             </div>
 
             <!-- Page Content -->
-            <main class="p-4 lg:p-6 bg-gray-50 dark:bg-gray-800 min-h-screen">
+            <main class="p-4 lg:p-6 bg-gray-50 min-h-screen">
                 @if(session('success'))
-                    <div class="mb-4 lg:mb-6 bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg relative animate-slide-up" role="alert">
+                    <div class="mb-4 lg:mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative animate-slide-up" role="alert">
                         <div class="flex items-center">
                             <i class="fas fa-check-circle ml-2"></i>
                             <span class="block sm:inline">{{ session('success') }}</span>
                         </div>
-                        <button onclick="this.parentElement.remove()" class="absolute top-2 left-2 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100">
+                        <button onclick="this.parentElement.remove()" class="absolute top-2 left-2 text-green-700 hover:text-green-900">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="mb-4 lg:mb-6 bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg relative animate-slide-up" role="alert">
+                    <div class="mb-4 lg:mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative animate-slide-up" role="alert">
                         <div class="flex items-center">
                             <i class="fas fa-exclamation-circle ml-2"></i>
                             <span class="block sm:inline">{{ session('error') }}</span>
                         </div>
-                        <button onclick="this.parentElement.remove()" class="absolute top-2 left-2 text-red-700 dark:text-red-300 hover:text-red-900 dark:hover:text-red-100">
+                        <button onclick="this.parentElement.remove()" class="absolute top-2 left-2 text-red-700 hover:text-red-900">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -313,70 +293,8 @@
 
     <!-- JavaScript -->
     <script>
-        // Global dark mode toggle function
-        function toggleDarkMode() {
-            console.log('toggleDarkMode called');
-            const html = document.documentElement;
-            const isDark = html.classList.contains('dark');
-            console.log('Current state - isDark:', isDark);
-            
-            if (isDark) {
-                html.classList.remove('dark');
-                localStorage.setItem('dark_mode', 'false');
-                console.log('Switched to light mode');
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('dark_mode', 'true');
-                console.log('Switched to dark mode');
-            }
-        }
-
-        // Dark mode functionality
-        function initDarkMode() {
-            console.log('Initializing dark mode...');
-            
-            // Load dark mode preference on page load
-            const savedMode = localStorage.getItem('dark_mode');
-            console.log('Saved mode:', savedMode);
-            
-            if (savedMode === 'true') {
-                document.documentElement.classList.add('dark');
-                console.log('Dark mode applied on load');
-            }
-            
-            // Dark mode toggle
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            console.log('Dark mode toggle element:', darkModeToggle);
-            
-            if (darkModeToggle) {
-                darkModeToggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    console.log('Dark mode toggle clicked');
-                    
-                    const html = document.documentElement;
-                    const isDark = html.classList.contains('dark');
-                    console.log('Current state - isDark:', isDark);
-                    
-                    if (isDark) {
-                        html.classList.remove('dark');
-                        localStorage.setItem('dark_mode', 'false');
-                        console.log('Switched to light mode');
-                    } else {
-                        html.classList.add('dark');
-                        localStorage.setItem('dark_mode', 'true');
-                        console.log('Switched to dark mode');
-                    }
-                });
-            } else {
-                console.error('Dark mode toggle button not found!');
-            }
-        }
-
         // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing dark mode...');
-            initDarkMode();
-            
             // Update date from client device
             const dateElement = document.getElementById('currentDate');
             if (dateElement) {
@@ -387,12 +305,6 @@
                 dateElement.textContent = `${year}/${month}/${day}`;
             }
         });
-
-        // Also try to initialize immediately (in case DOM is already loaded)
-        if (document.readyState !== 'loading') {
-            console.log('DOM already loaded, initializing dark mode immediately...');
-            initDarkMode();
-        }
 
         // Mobile sidebar toggle
         function initSidebar() {

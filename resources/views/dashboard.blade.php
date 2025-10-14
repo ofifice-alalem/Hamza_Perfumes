@@ -125,16 +125,16 @@
     <div class="card-body p-0">
         <div class="overflow-x-auto">
             <table class="table" id="salesTable">
-                <thead class="bg-gray-50 dark:bg-gray-600">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="text-center">#</th>
-                        <th>العطر</th>
-                        <th class="text-center">الصنف</th>
-                        <th class="text-center">عدد المبيعات</th>
-                        <th class="text-center">الزبائن العاديين</th>
-                        <th class="text-center">VIP</th>
-                        <th class="text-center">إجمالي الكمية</th>
-                        <th class="text-center">إجمالي المبلغ</th>
+                        <th class="text-right text-sm font-medium">#</th>
+                        <th class="text-right text-sm font-medium">العطر</th>
+                        <th class="text-right text-sm font-medium">الصنف</th>
+                        <th class="text-right text-sm font-medium">عدد المبيعات</th>
+                        <th class="text-right text-sm font-medium">الزبائن العاديين</th>
+                        <th class="text-right text-sm font-medium">VIP</th>
+                        <th class="text-right text-sm font-medium">إجمالي الكمية</th>
+                        <th class="text-right text-sm font-medium">إجمالي المبلغ</th>
                     </tr>
                 </thead>
                 <tbody id="salesTableBody">
@@ -306,36 +306,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             } else {
                 tbody.innerHTML = data.perfumes.map((perfume, index) => `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                        <td class="text-center font-bold">${index + 1}</td>
-                        <td>
-                            <span class="font-semibold text-gray-900 dark:text-gray-100">${perfume.name}</span>
+                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <td class="text-right text-sm font-medium py-3">${index + 1}</td>
+                        <td class="text-right text-sm py-3">
+                            <span class="font-medium text-gray-900">${perfume.name}</span>
                         </td>
-                        <td class="text-center">
-                            <span class="inline-block bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-full text-sm">
+                        <td class="text-right text-sm py-3">
+                            <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
                                 ${perfume.category_name || 'غير مصنف'}
                             </span>
                         </td>
-                        <td class="text-center">
-                            <span class="inline-block bg-green-500 text-white px-3 py-2 rounded-full font-semibold">
+                        <td class="text-right text-sm py-3">
+                            <span class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
                                 ${perfume.sales_count}
                             </span>
                         </td>
-                        <td class="text-center">
-                            <div class="font-semibold text-blue-600 dark:text-blue-400 text-lg">${perfume.regular_count}</div>
-                            <div class="text-gray-500 text-sm">عميل</div>
+                        <td class="text-right text-sm py-3">
+                            <div class="font-medium text-blue-600">${perfume.regular_count}</div>
+                            <div class="text-gray-400 text-xs">عميل</div>
                         </td>
-                        <td class="text-center">
-                            <div class="font-semibold text-yellow-600 dark:text-yellow-400 text-lg">${perfume.vip_count}</div>
-                            <div class="text-gray-500 text-sm">عميل</div>
+                        <td class="text-right text-sm py-3">
+                            <div class="font-medium text-yellow-600">${perfume.vip_count}</div>
+                            <div class="text-gray-400 text-xs">عميل</div>
                         </td>
-                        <td class="text-center">
-                            <div class="font-semibold text-cyan-600 dark:text-cyan-400 text-lg">${perfume.total_ml.toLocaleString()}</div>
-                            <div class="text-gray-500 text-sm">مل</div>
+                        <td class="text-right text-sm py-3">
+                            <div class="font-medium text-cyan-600">${perfume.total_ml.toLocaleString()}</div>
+                            <div class="text-gray-400 text-xs">مل</div>
                         </td>
-                        <td class="text-center">
-                            <div class="font-bold text-green-600 dark:text-green-400 text-lg">${perfume.total_amount.toLocaleString()}</div>
-                            <div class="text-gray-500 text-sm">دينار</div>
+                        <td class="text-right text-sm py-3">
+                            <div class="font-semibold text-green-600">${perfume.total_amount.toLocaleString()}</div>
+                            <div class="text-gray-400 text-xs">دينار</div>
                         </td>
                     </tr>
                 `).join('');
@@ -410,13 +410,32 @@ document.addEventListener('DOMContentLoaded', function() {
 @media (max-width: 768px) {
     .table th,
     .table td {
-        padding: 8px 4px;
-        font-size: 0.875rem;
+        padding: 6px 8px;
+        font-size: 0.8rem;
     }
     
     .stats-card {
         margin-bottom: 1rem;
     }
+}
+
+/* تحسين مظهر الجدول */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th {
+    background-color: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 16px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.table td {
+    padding: 8px 16px;
+    vertical-align: middle;
 }
 </style>
 @endsection

@@ -7,7 +7,7 @@
 <div class="flex justify-between items-center mb-6">
     <div>
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            <i class="fas fa-dollar-sign ml-2 text-blue-600"></i>إضافة أسعار جديدة
+            <i class="fas fa-dollar-sign mr-3 text-blue-600"></i>إضافة أسعار جديدة
         </h2>
         <p class="text-gray-600 dark:text-gray-300">إضافة أسعار للعطور غير المصنفة</p>
     </div>
@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-header bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
             <h5 class="text-lg font-bold">
-                <i class="fas fa-dollar-sign ml-2"></i>بيانات الأسعار
+                <i class="fas fa-dollar-sign mr-3"></i>بيانات الأسعار
             </h5>
         </div>
             <div class="card-body p-4">
@@ -132,10 +132,10 @@
                     
                     <div class="flex gap-3 mt-6">
                         <button type="submit" class="flex-1 btn-success">
-                            <i class="fas fa-save ml-2"></i>حفظ جميع الأسعار
+                            <i class="fas fa-save mr-3"></i>حفظ جميع الأسعار
                         </button>
                         <a href="{{ route('prices.index') }}" class="flex-1 btn-secondary text-center">
-                            <i class="fas fa-arrow-right ml-2"></i>رجوع للقائمة
+                            <i class="fas fa-arrow-right mr-3"></i>رجوع للقائمة
                         </a>
                     </div>
                 </form>

@@ -6,13 +6,13 @@
 @section('content')
 <div class="flex justify-between items-center mb-6">
     <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            <i class="fas fa-user-edit ml-2 text-blue-600"></i>تعديل مستخدم
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-user-edit mr-3 text-blue-600"></i>تعديل مستخدم
         </h2>
-        <p class="text-gray-600 dark:text-gray-300">تعديل بيانات المستخدم</p>
+        <p class="text-gray-600">تعديل بيانات المستخدم</p>
     </div>
     <a href="{{ route('users.index') }}" class="btn-secondary">
-        <i class="fas fa-arrow-right ml-2"></i>العودة للقائمة
+        <i class="fas fa-arrow-right mr-3"></i>العودة للقائمة
     </a>
 </div>
 
@@ -20,7 +20,7 @@
     <div class="card">
         <div class="card-header bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
             <h5 class="text-lg font-bold">
-                <i class="fas fa-user-edit ml-2"></i>تعديل بيانات {{ $user->username }}
+                <i class="fas fa-user-edit mr-3"></i>تعديل بيانات {{ $user->username }}
             </h5>
         </div>
         <div class="card-body">
@@ -30,7 +30,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-1">
                         <label for="username" class="form-label">
-                            <i class="fas fa-user ml-2 text-blue-600"></i>اسم المستخدم
+                            <i class="fas fa-user mr-3 text-blue-600"></i>اسم المستخدم
                         </label>
                         <input type="text" class="form-input @error('username') error @enderror" id="username" name="username" value="{{ old('username', $user->username) }}" required>
                         @error('username')
@@ -40,7 +40,7 @@
 
                     <div class="md:col-span-1">
                         <label for="role" class="form-label">
-                            <i class="fas fa-shield-alt ml-2 text-yellow-600"></i>الصلاحية
+                            <i class="fas fa-shield-alt mr-3 text-yellow-600"></i>الصلاحية
                         </label>
                         <select class="form-select @error('role') error @enderror" id="role" name="role" required>
                             <option value="">اختر الصلاحية</option>
@@ -55,7 +55,7 @@
 
                     <div class="md:col-span-2">
                         <label for="password" class="form-label">
-                            <i class="fas fa-lock ml-2 text-red-600"></i>كلمة المرور الجديدة (اختياري)
+                            <i class="fas fa-lock mr-3 text-red-600"></i>كلمة المرور الجديدة (اختياري)
                         </label>
                         <input type="password" class="form-input @error('password') error @enderror" id="password" name="password">
                         <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">اتركه فارغاً إذا كنت لا تريد تغيير كلمة المرور</p>
@@ -67,10 +67,10 @@
 
                 <div class="flex gap-3 mt-6">
                     <button type="submit" class="flex-1 btn-warning">
-                        <i class="fas fa-save ml-2"></i>حفظ التغييرات
+                        <i class="fas fa-save mr-3"></i>حفظ التغييرات
                     </button>
                     <a href="{{ route('users.index') }}" class="flex-1 btn-secondary text-center">
-                        <i class="fas fa-times ml-2"></i>إلغاء
+                        <i class="fas fa-times mr-3"></i>إلغاء
                     </a>
                 </div>
             </form>
