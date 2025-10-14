@@ -43,7 +43,8 @@ class SaleController extends Controller
         $request->validate([
             'perfume_id' => 'required|exists:perfumes,id',
             'size_id' => 'required',
-            'customer_type' => 'required|in:regular,vip'
+            'customer_type' => 'required|in:regular,vip',
+            'payment_method' => 'required|in:cash,card'
         ]);
 
         $perfume = Perfume::find($request->perfume_id);
@@ -95,7 +96,8 @@ class SaleController extends Controller
             'size_id' => $request->size_id,
             'customer_type' => $request->customer_type,
             'is_full_bottle' => $request->get('is_full_bottle', false),
-            'price' => $finalPrice
+            'price' => $finalPrice,
+            'payment_method' => $request->payment_method
         ]);
 
         return redirect()->route('sales.index')->with('success', 'تم تسجيل البيع بنجاح');
@@ -147,6 +149,86 @@ class SaleController extends Controller
         return response()->json(['error' => 'السعر غير محدد'], 404);
     }
     
+    public function update(Request $request, Sale $sale)
+    {
+        // التحقق من الصلاحيات
+        if (!auth()->user()->isSuperAdmin() && $sale->user_id !== auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'غير مسموح لك بتعديل هذه العملية'], 403);
+        }
+
+        $request->validate([
+            'size_id' => 'required',
+            'customer_type' => 'required|in:regular,vip',
+            'payment_method' => 'required|in:cash,card'
+        ]);
+
+        // حساب السعر الجديد
+        $perfume = $sale->perfume;
+        $finalPrice = null;
+        $isFullBottle = false;
+        $actualSizeId = $request->size_id;
+        
+        // إذا كان الحجم هو العبوة الكاملة
+        if (strpos($request->size_id, 'bottle_') === 0) {
+            $bottlePrice = PerfumePrice::where('perfume_id', $sale->perfume_id)
+                ->where(function($query) {
+                    $query->whereNotNull('bottle_price_regular')
+                          ->orWhereNotNull('bottle_price_vip');
+                })
+                ->first();
+            
+            if ($bottlePrice) {
+                $finalPrice = $request->customer_type === 'vip' ? $bottlePrice->bottle_price_vip : $bottlePrice->bottle_price_regular;
+                $actualSizeId = str_replace('bottle_', '', $request->size_id);
+                $isFullBottle = true;
+            }
+        } else {
+            // البحث في أسعار التصنيف أولاً
+            $price = null;
+            if ($perfume->category_id) {
+                $price = CategoryPrice::where('category_id', $perfume->category_id)
+                    ->where('size_id', $request->size_id)
+                    ->first();
+            }
+            
+            // إذا لم يوجد في التصنيف، ابحث في الأسعار المخصصة
+            if (!$price) {
+                $price = PerfumePrice::where('perfume_id', $sale->perfume_id)
+                    ->where('size_id', $request->size_id)
+                    ->first();
+            }
+
+            if ($price) {
+                $finalPrice = $request->customer_type === 'vip' ? $price->price_vip : $price->price_regular;
+            }
+        }
+
+        if (!$finalPrice) {
+            return response()->json(['success' => false, 'message' => 'السعر غير محدد لهذا الحجم']);
+        }
+
+        $sale->update([
+            'size_id' => $actualSizeId,
+            'customer_type' => $request->customer_type,
+            'payment_method' => $request->payment_method,
+            'is_full_bottle' => $isFullBottle,
+            'price' => $finalPrice
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'تم تحديث البيع بنجاح']);
+    }
+
+    public function destroy(Sale $sale)
+    {
+        // التحقق من الصلاحيات
+        if (!auth()->user()->isSuperAdmin() && $sale->user_id !== auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'غير مسموح لك بحذف هذه العملية'], 403);
+        }
+
+        $sale->delete();
+        return response()->json(['success' => true, 'message' => 'تم حذف البيع بنجاح']);
+    }
+
     public function getAvailableSizes($perfumeId)
     {
         $perfume = Perfume::find($perfumeId);

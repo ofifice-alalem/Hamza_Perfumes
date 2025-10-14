@@ -62,6 +62,10 @@ class DashboardController extends Controller
             $query->where('customer_type', $request->customer_type);
         }
         
+        if ($request->payment_method) {
+            $query->where('payment_method', $request->payment_method);
+        }
+        
         if ($request->category_id) {
             if ($request->category_id === 'uncategorized') {
                 $query->whereHas('perfume', function($q) {
@@ -84,7 +88,8 @@ class DashboardController extends Controller
             'total_sales' => $sales->sum('price'),
             'total_customers' => $sales->count(),
             'total_ml' => $this->calculateTotalML($sales),
-            'avg_sale' => $sales->count() > 0 ? $sales->avg('price') : 0
+            'total_cash' => $sales->where('payment_method', 'cash')->sum('price'),
+            'total_card' => $sales->where('payment_method', 'card')->sum('price')
         ];
         
         // إحصائيات البائعين
@@ -106,6 +111,8 @@ class DashboardController extends Controller
                 'sales_count' => $perfumeSales->count(),
                 'regular_count' => $perfumeSales->where('customer_type', 'regular')->count(),
                 'vip_count' => $perfumeSales->where('customer_type', 'vip')->count(),
+                'cash_count' => $perfumeSales->where('payment_method', 'cash')->count(),
+                'card_count' => $perfumeSales->where('payment_method', 'card')->count(),
                 'total_amount' => $perfumeSales->sum('price'),
                 'total_ml' => $this->calculateTotalML($perfumeSales),
                 'avg_price' => $perfumeSales->avg('price')

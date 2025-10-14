@@ -53,6 +53,8 @@ Route::middleware('auth')->group(function () {
     // Sales - all roles
     Route::get('sales', [SaleController::class, 'index'])->name('sales.index');
     Route::post('sales', [SaleController::class, 'store'])->name('sales.store');
+    Route::put('sales/{sale}', [SaleController::class, 'update'])->name('sales.update');
+    Route::delete('sales/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
     Route::get('api/get-price', [SaleController::class, 'getPrice']);
     Route::get('api/get-available-sizes/{perfume}', [SaleController::class, 'getAvailableSizes']);
 });

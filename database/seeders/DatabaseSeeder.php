@@ -124,6 +124,7 @@ class DatabaseSeeder extends Seeder
                 'customer_type' => $customerType,
                 'price' => $price,
                 'is_full_bottle' => $isFullBottle,
+                'payment_method' => rand(0, 1) ? 'cash' : 'card',
                 'created_at' => now()->subDays(rand(0, 365))
             ]);
         }

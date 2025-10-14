@@ -45,12 +45,22 @@ class PerfumeController extends Controller
             'category_id' => 'nullable|exists:categories,id'
         ]);
         $perfume->update($request->only('name', 'category_id'));
+        
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'تم تحديث العطر بنجاح']);
+        }
+        
         return redirect()->route('perfumes.index')->with('success', 'تم تحديث العطر بنجاح');
     }
 
     public function destroy(Perfume $perfume)
     {
         $perfume->delete();
+        
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'تم حذف العطر بنجاح']);
+        }
+        
         return redirect()->route('perfumes.index')->with('success', 'تم حذف العطر بنجاح');
     }
 

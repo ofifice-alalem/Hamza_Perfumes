@@ -16,74 +16,94 @@
 <!-- فلاتر المبيعات -->
 <div class="card mb-6">
     <div class="card-body">
-        <form id="salesFilters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-            <div>
-                <label class="form-label">من تاريخ</label>
-                <input type="date" class="form-input" id="date_from" name="date_from">
+        <form id="salesFilters">
+            <!-- الصف الأول -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="form-label">من تاريخ</label>
+                    <input type="date" class="form-input" id="date_from" name="date_from">
+                </div>
+                <div>
+                    <label class="form-label">إلى تاريخ</label>
+                    <input type="date" class="form-input" id="date_to" name="date_to">
+                </div>
+                <div>
+                    <label class="form-label">نوع العميل</label>
+                    <select class="form-select" id="customer_type" name="customer_type">
+                        <option value="">الكل</option>
+                        <option value="regular">عادي</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">الصنف</label>
+                    <select class="form-select" id="category_id" name="category_id">
+                        <option value="">جميع الأصناف</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                        <option value="uncategorized">غير مصنف</option>
+                    </select>
+                </div>
             </div>
-            <div>
-                <label class="form-label">إلى تاريخ</label>
-                <input type="date" class="form-input" id="date_to" name="date_to">
-            </div>
-            <div>
-                <label class="form-label">نوع العميل</label>
-                <select class="form-select" id="customer_type" name="customer_type">
-                    <option value="">الكل</option>
-                    <option value="regular">عادي</option>
-                    <option value="vip">VIP</option>
-                </select>
-            </div>
-            <div>
-                <label class="form-label">الصنف</label>
-                <select class="form-select" id="category_id" name="category_id">
-                    <option value="">جميع الأصناف</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                    @endforeach
-                    <option value="uncategorized">غير مصنف</option>
-                </select>
-            </div>
-            <div>
-                <label class="form-label">البائع</label>
-                <select class="form-select" id="user_id" name="user_id">
-                    <option value="">جميع البائعين</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="form-label">ترتيب حسب</label>
-                <select class="form-select" id="sort_by" name="sort_by">
-                    <option value="sales_count">عدد المبيعات</option>
-                    <option value="total_amount">إجمالي المبلغ</option>
-                    <option value="total_ml">إجمالي الكمية (مل)</option>
-                </select>
+            
+            <!-- الصف الثاني -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="form-label">البائع</label>
+                    <select class="form-select" id="user_id" name="user_id">
+                        <option value="">جميع البائعين</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">طريقة الدفع</label>
+                    <select class="form-select" id="payment_method" name="payment_method">
+                        <option value="">الكل</option>
+                        <option value="cash">كاش</option>
+                        <option value="card">بطاقة</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">ترتيب حسب</label>
+                    <select class="form-select" id="sort_by" name="sort_by">
+                        <option value="sales_count">عدد المبيعات</option>
+                        <option value="total_amount">إجمالي المبلغ</option>
+                        <option value="total_ml">إجمالي الكمية (مل)</option>
+                    </select>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
 <!-- إحصائيات سريعة -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6" id="salesStats">
-    <div class="stats-card bg-gradient-to-r from-green-500 to-emerald-500">
-        <div class="stats-value" id="totalSales">0</div>
-        <div class="stats-title">إجمالي المبيعات</div>
-        <div class="stats-change">دينار</div>
-    </div>
-    <div class="stats-card bg-gradient-to-r from-blue-500 to-purple-600">
+<div class="flex gap-6 mb-6 w-full" id="salesStats">
+    <div class="stats-card bg-gradient-to-r from-blue-500 to-purple-600 flex-1">
         <div class="stats-value" id="totalCustomers">0</div>
         <div class="stats-title">عدد العملاء</div>
         <div class="stats-change">عميل</div>
     </div>
-    <div class="stats-card bg-gradient-to-r from-orange-500 to-red-500">
+    <div class="stats-card bg-gradient-to-r from-orange-500 to-red-500 flex-1">
         <div class="stats-value" id="totalML">0</div>
         <div class="stats-title">إجمالي الكمية</div>
         <div class="stats-change">مل</div>
     </div>
-    <div class="stats-card bg-gradient-to-r from-indigo-500 to-purple-600">
-        <div class="stats-value" id="avgSale">0</div>
-        <div class="stats-title">متوسط البيع</div>
+    <div class="stats-card bg-gradient-to-r from-green-600 to-emerald-600 flex-1">
+        <div class="stats-value" id="totalCash">0</div>
+        <div class="stats-title"> إجمالي الكاش</div>
+        <div class="stats-change">دينار</div>
+    </div>
+    <div class="stats-card bg-gradient-to-r from-purple-500 to-indigo-600 flex-1">
+        <div class="stats-value" id="totalCard">0</div>
+        <div class="stats-title"> إجمالي البطاقة</div>
+        <div class="stats-change">دينار</div>
+    </div>
+    <div class="stats-card bg-gradient-to-r from-green-500 to-emerald-500 flex-1">
+        <div class="stats-value" id="totalSales">0</div>
+        <div class="stats-title">الاجمالي</div>
         <div class="stats-change">دينار</div>
     </div>
 </div>
@@ -129,18 +149,118 @@
                     <tr>
                         <th class="text-right text-sm font-medium">#</th>
                         <th class="text-right text-sm font-medium">العطر</th>
-                        <th class="text-right text-sm font-medium">الصنف</th>
-                        <th class="text-right text-sm font-medium">عدد المبيعات</th>
-                        <th class="text-right text-sm font-medium">الزبائن العاديين</th>
-                        <th class="text-right text-sm font-medium">VIP</th>
-                        <th class="text-right text-sm font-medium">إجمالي الكمية</th>
-                        <th class="text-right text-sm font-medium">إجمالي المبلغ</th>
+                        <th class="text-right text-sm font-medium">الحجم</th>
+                        <th class="text-right text-sm font-medium">نوع العميل</th>
+                        <th class="text-right text-sm font-medium">طريقة الدفع</th>
+                        <th class="text-right text-sm font-medium">البائع</th>
+                        <th class="text-right text-sm font-medium">السعر</th>
+                        <th class="text-right text-sm font-medium">التاريخ</th>
+                        <th class="text-right text-sm font-medium">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="salesTableBody">
                     <!-- سيتم تحميل البيانات بـ JavaScript -->
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Sale Modal -->
+<div id="editSaleModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">تعديل البيع</h3>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="editSaleForm">
+                <input type="hidden" id="editSaleId">
+                <input type="hidden" id="editPerfumeId">
+                <div class="mb-4">
+                    <label class="form-label">الحجم</label>
+                    <select id="editSizeId" class="form-select">
+                        <option value="">جاري تحميل الأحجام...</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">نوع العميل</label>
+                    <select id="editCustomerType" class="form-select">
+                        <option value="regular">عادي</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">السعر</label>
+                    <div class="flex items-center h-12 px-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg" id="editPriceDisplay">
+                        <i class="fas fa-info-circle ml-2 text-blue-600"></i>
+                        <span class="text-blue-800 dark:text-blue-200 text-sm">اختر الحجم ونوع العميل</span>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">طريقة الدفع</label>
+                    <div class="flex gap-2 mt-2">
+                        <label class="flex items-center cursor-pointer flex-1">
+                            <input type="radio" name="edit_payment_method" value="cash" class="sr-only">
+                            <div class="payment-option w-full" data-value="cash">
+                                <i class="fas fa-money-bill-wave ml-2"></i>كاش
+                            </div>
+                        </label>
+                        <label class="flex items-center cursor-pointer flex-1">
+                            <input type="radio" name="edit_payment_method" value="card" class="sr-only">
+                            <div class="payment-option w-full" data-value="card">
+                                <i class="fas fa-credit-card ml-2"></i>بطاقة
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="updateSale()" class="btn-success flex-1">
+                        <i class="fas fa-save ml-2"></i>حفظ
+                    </button>
+                    <button type="button" onclick="closeEditModal()" class="btn-secondary flex-1">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Perfume Modal -->
+<div id="deletePerfumeModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+        <div class="p-6">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center ml-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">تأكيد الحذف</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">هذا الإجراء لا يمكن التراجع عنه</p>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-yellow-600 dark:text-yellow-400 ml-3 mt-0.5"></i>
+                    <div class="text-sm">
+                        <strong class="text-yellow-800 dark:text-yellow-200">تحذير:</strong>
+                        <span class="text-yellow-700 dark:text-yellow-300">سيتم حذف العطر "<span id="deletePerfumeName" class="font-bold"></span>" وجميع بياناته نهائياً.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="button" onclick="closeDeletePerfumeModal()" class="flex-1 btn-secondary">
+                    <i class="fas fa-times ml-2"></i>إلغاء
+                </button>
+                <button type="button" onclick="confirmDeletePerfume()" class="flex-1 btn-danger">
+                    <i class="fas fa-trash ml-2"></i>حذف نهائياً
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -285,19 +405,20 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('totalSales').textContent = data.stats.total_sales.toLocaleString();
             document.getElementById('totalCustomers').textContent = data.stats.total_customers;
             document.getElementById('totalML').textContent = data.stats.total_ml.toLocaleString();
-            document.getElementById('avgSale').textContent = data.stats.avg_sale.toFixed(2);
+            document.getElementById('totalCash').textContent = data.stats.total_cash.toLocaleString();
+            document.getElementById('totalCard').textContent = data.stats.total_card.toLocaleString();
             
             // تحديث عداد النتائج
-            document.getElementById('resultsCount').textContent = `${data.total_count} نتيجة`;
+            document.getElementById('resultsCount').textContent = `${data.sales.length} مبيعة`;
             
             // تحديث الجدول
             const tbody = document.getElementById('salesTableBody');
-            if (data.perfumes.length === 0) {
+            if (data.sales.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center py-12">
+                        <td colspan="9" class="text-center py-12">
                             <div class="flex flex-col items-center">
-                                <i class="fas fa-chart-line text-gray-400 text-5xl mb-4"></i>
+                                <i class="fas fa-shopping-cart text-gray-400 text-5xl mb-4"></i>
                                 <h5 class="text-gray-500 text-lg font-semibold mb-2">لا توجد مبيعات</h5>
                                 <p class="text-gray-400">لا توجد مبيعات تطابق الفلاتر المحددة</p>
                             </div>
@@ -305,37 +426,51 @@ document.addEventListener('DOMContentLoaded', function() {
                     </tr>
                 `;
             } else {
-                tbody.innerHTML = data.perfumes.map((perfume, index) => `
+                tbody.innerHTML = data.sales.map((sale, index) => `
                     <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100">
-                        <td class="text-right text-sm font-medium py-3">${index + 1}</td>
+                        <td class="text-right text-sm font-medium py-3">${sale.id}</td>
                         <td class="text-right text-sm py-3">
-                            <span class="font-medium text-gray-900">${perfume.name}</span>
+                            <span class="font-medium text-gray-900">${sale.perfume_name}</span>
                         </td>
                         <td class="text-right text-sm py-3">
-                            <span class="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
-                                ${perfume.category_name || 'غير مصنف'}
+                            ${sale.size_label ? `<span class="px-2 py-1 text-xs rounded-full ${sale.is_full_bottle ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">
+                                ${sale.is_full_bottle ? '<i class="fas fa-wine-bottle ml-1"></i>' : ''}${sale.size_label}${sale.is_full_bottle ? ' (عبوة كاملة)' : ''}
+                            </span>` : '<span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800"><i class="fas fa-wine-bottle ml-1"></i>عبوة كاملة</span>'}
+                        </td>
+                        <td class="text-right text-sm py-3">
+                            <span class="px-2 py-1 text-xs rounded-full ${sale.customer_type === 'vip' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}">
+                                <i class="fas ${sale.customer_type === 'vip' ? 'fa-crown' : 'fa-user'} ml-1"></i>
+                                ${sale.customer_type === 'vip' ? 'VIP' : 'عادي'}
                             </span>
                         </td>
                         <td class="text-right text-sm py-3">
-                            <span class="inline-block bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
-                                ${perfume.sales_count}
+                            <span class="px-2 py-1 text-xs rounded-full ${sale.payment_method === 'card' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}">
+                                <i class="fas ${sale.payment_method === 'card' ? 'fa-credit-card' : 'fa-money-bill-wave'} ml-1"></i>
+                                ${sale.payment_method === 'card' ? 'بطاقة' : 'كاش'}
                             </span>
                         </td>
                         <td class="text-right text-sm py-3">
-                            <div class="font-medium text-blue-600">${perfume.regular_count}</div>
-                            <div class="text-gray-400 text-xs">عميل</div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
+                                ${sale.user_name || 'غير محدد'}
+                            </span>
                         </td>
                         <td class="text-right text-sm py-3">
-                            <div class="font-medium text-yellow-600">${perfume.vip_count}</div>
-                            <div class="text-gray-400 text-xs">عميل</div>
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">
+                                ${parseFloat(sale.price).toLocaleString()} دينار
+                            </span>
+                        </td>
+                        <td class="text-right text-sm py-3 text-gray-500">
+                            ${new Date(sale.created_at).toLocaleDateString('ar-SA')} ${new Date(sale.created_at).toLocaleTimeString('ar-SA', {hour: '2-digit', minute: '2-digit'})}
                         </td>
                         <td class="text-right text-sm py-3">
-                            <div class="font-medium text-cyan-600">${perfume.total_ml.toLocaleString()}</div>
-                            <div class="text-gray-400 text-xs">مل</div>
-                        </td>
-                        <td class="text-right text-sm py-3">
-                            <div class="font-semibold text-green-600">${perfume.total_amount.toLocaleString()}</div>
-                            <div class="text-gray-400 text-xs">دينار</div>
+                            <div class="flex gap-2 justify-center">
+                                <button onclick="editSale(${sale.id}, ${sale.perfume_id}, ${sale.size_id}, '${sale.customer_type}', '${sale.payment_method}', ${sale.is_full_bottle})" class="w-8 h-8 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full flex items-center justify-center transition-colors">
+                                    <i class="fas fa-edit text-xs"></i>
+                                </button>
+                                <button onclick="deleteSale(${sale.id})" class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `).join('');
@@ -347,6 +482,204 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error loading sales data:', error);
         }
+    }
+});
+
+// Sale Edit Functions
+function editSale(id, perfumeId, sizeId, customerType, paymentMethod, isFullBottle) {
+    document.getElementById('editSaleId').value = id;
+    document.getElementById('editPerfumeId').value = perfumeId;
+    document.getElementById('editCustomerType').value = customerType;
+    
+    // Set payment method
+    document.querySelector(`input[name="edit_payment_method"][value="${paymentMethod}"]`).checked = true;
+    updateEditPaymentOptions();
+    
+    // Load available sizes
+    loadEditSizes(perfumeId, sizeId, isFullBottle);
+    
+    document.getElementById('editSaleModal').classList.remove('hidden');
+}
+
+function loadEditSizes(perfumeId, currentSizeId, isFullBottle) {
+    const sizeSelect = document.getElementById('editSizeId');
+    sizeSelect.innerHTML = '<option value="">جاري تحميل الأحجام...</option>';
+    
+    fetch(`/api/get-available-sizes/${perfumeId}`)
+        .then(response => response.json())
+        .then(data => {
+            sizeSelect.innerHTML = '';
+            
+            if (data && data.length > 0) {
+                data.forEach(size => {
+                    const option = document.createElement('option');
+                    option.value = size.id;
+                    option.textContent = size.label;
+                    
+                    if ((isFullBottle && size.id === `bottle_${currentSizeId}`) || 
+                        (!isFullBottle && size.id == currentSizeId)) {
+                        option.selected = true;
+                    }
+                    
+                    sizeSelect.appendChild(option);
+                });
+            } else {
+                sizeSelect.innerHTML = '<option value="">لا توجد أحجام متاحة</option>';
+            }
+        })
+        .finally(() => {
+            setTimeout(updateEditPrice, 100);
+        });
+    
+    document.getElementById('editSizeId').addEventListener('change', updateEditPrice);
+    document.getElementById('editCustomerType').addEventListener('change', updateEditPrice);
+}
+
+function updateEditPrice() {
+    const perfumeId = document.getElementById('editPerfumeId').value;
+    const sizeId = document.getElementById('editSizeId').value;
+    const customerType = document.getElementById('editCustomerType').value;
+    const priceDisplay = document.getElementById('editPriceDisplay');
+
+    if (perfumeId && sizeId && customerType) {
+        fetch(`/api/get-price?perfume_id=${perfumeId}&size_id=${sizeId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    priceDisplay.innerHTML = '<i class="fas fa-exclamation-triangle ml-2 text-red-600"></i><span class="text-red-600">السعر غير محدد لهذا الحجم</span>';
+                } else {
+                    const price = customerType === 'vip' ? data.vip : data.regular;
+                    priceDisplay.innerHTML = `<i class="fas fa-tag ml-2 text-green-600"></i><span class="text-green-800 dark:text-green-200 font-semibold">${price} دينار</span>`;
+                }
+            })
+            .catch(error => {
+                priceDisplay.innerHTML = '<i class="fas fa-exclamation-triangle ml-2 text-red-600"></i><span class="text-red-600">خطأ في جلب السعر</span>';
+            });
+    }
+}
+
+function closeEditModal() {
+    document.getElementById('editSaleModal').classList.add('hidden');
+}
+
+function updateEditPaymentOptions() {
+    const paymentOptions = document.querySelectorAll('#editSaleModal .payment-option');
+    const checkedInput = document.querySelector('input[name="edit_payment_method"]:checked');
+    
+    paymentOptions.forEach(option => {
+        option.classList.remove('active');
+        if (option.dataset.value === checkedInput?.value) {
+            option.classList.add('active');
+        }
+    });
+}
+
+function updateSale() {
+    const id = document.getElementById('editSaleId').value;
+    const sizeId = document.getElementById('editSizeId').value;
+    const customerType = document.getElementById('editCustomerType').value;
+    const paymentMethod = document.querySelector('input[name="edit_payment_method"]:checked').value;
+    
+    if (!sizeId) {
+        alert('يرجى اختيار الحجم');
+        return;
+    }
+    
+    fetch(`/sales/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            size_id: sizeId,
+            customer_type: customerType,
+            payment_method: paymentMethod
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            loadSalesData();
+            closeEditModal();
+        } else {
+            alert(data.message || 'خطأ في تحديث البيع');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('خطأ في تحديث البيع');
+    });
+}
+
+// Perfume Delete Functions
+let perfumeToDelete = null;
+
+function deletePerfume(id, name) {
+    perfumeToDelete = id;
+    document.getElementById('deletePerfumeName').textContent = name;
+    document.getElementById('deletePerfumeModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDeletePerfumeModal() {
+    document.getElementById('deletePerfumeModal').classList.add('hidden');
+    document.body.style.overflow = '';
+    perfumeToDelete = null;
+}
+
+function confirmDeletePerfume() {
+    if (perfumeToDelete) {
+        fetch(`/perfumes/${perfumeToDelete}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadSalesData(); // إعادة تحميل البيانات
+            } else {
+                alert('خطأ في حذف العطر');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('خطأ في حذف العطر');
+        })
+        .finally(() => {
+            closeDeletePerfumeModal();
+        });
+    }
+}
+
+// Add click handlers for edit modal payment options
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#editSaleModal .payment-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const value = this.dataset.value;
+            const input = document.querySelector(`input[name="edit_payment_method"][value="${value}"]`);
+            input.checked = true;
+            updateEditPaymentOptions();
+        });
+    });
+});
+
+// إغلاق modals عند النقر خارجها
+document.getElementById('editSaleModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+});
+
+document.getElementById('deletePerfumeModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeletePerfumeModal();
+});
+
+// إغلاق modals بمفتاح Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeEditModal();
+        closeDeletePerfumeModal();
     }
 });
 </script>
@@ -378,6 +711,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
 #exportMenu a:hover {
     transform: translateX(2px);
+}
+
+.payment-option {
+    padding: 8px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.dark .payment-option {
+    background: #374151;
+    border-color: #4b5563;
+    color: #d1d5db;
+}
+
+.payment-option:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.dark .payment-option:hover {
+    border-color: #3b82f6;
+    background: #1e3a8a;
+}
+
+.payment-option.active {
+    border-color: #3b82f6;
+    background: #3b82f6;
+    color: white;
+}
+
+.dark .payment-option.active {
+    border-color: #3b82f6;
+    background: #3b82f6;
+    color: white;
 }
 
 @keyframes fadeInDown {
