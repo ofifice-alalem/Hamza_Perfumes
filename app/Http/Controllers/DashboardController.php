@@ -103,37 +103,35 @@ class DashboardController extends Controller
             ];
         })->sortByDesc('total_amount')->values();
         
-        $perfumeStats = $sales->groupBy('perfume_id')->map(function ($perfumeSales) {
-            $perfume = $perfumeSales->first()->perfume;
+        // تحضير بيانات المبيعات الفردية
+        $salesData = $sales->map(function ($sale) {
             return [
-                'name' => $perfume->name,
-                'category_name' => $perfume->category ? $perfume->category->name : null,
-                'sales_count' => $perfumeSales->count(),
-                'regular_count' => $perfumeSales->where('customer_type', 'regular')->count(),
-                'vip_count' => $perfumeSales->where('customer_type', 'vip')->count(),
-                'cash_count' => $perfumeSales->where('payment_method', 'cash')->count(),
-                'card_count' => $perfumeSales->where('payment_method', 'card')->count(),
-                'total_amount' => $perfumeSales->sum('price'),
-                'total_ml' => $this->calculateTotalML($perfumeSales),
-                'avg_price' => $perfumeSales->avg('price')
+                'id' => $sale->id,
+                'perfume_id' => $sale->perfume_id,
+                'perfume_name' => $sale->perfume->name,
+                'size_id' => $sale->size_id,
+                'size_label' => $sale->size ? $sale->size->label : null,
+                'customer_type' => $sale->customer_type,
+                'payment_method' => $sale->payment_method,
+                'is_full_bottle' => $sale->is_full_bottle,
+                'price' => $sale->price,
+                'user_name' => $sale->user ? $sale->user->name : null,
+                'created_at' => $sale->created_at->toISOString()
             ];
-        })->values();
+        })->sortByDesc('created_at')->values();
         
-        $sortBy = $request->sort_by ?? 'sales_count';
-        $perfumeStats = $perfumeStats->sortByDesc($sortBy)->values();
-        
-        $totalCount = $perfumeStats->count();
+        $totalCount = $salesData->count();
         
         if ($paginate) {
             $page = $request->get('page', 1);
             $perPage = 50;
             $offset = ($page - 1) * $perPage;
-            $perfumeStats = $perfumeStats->slice($offset, $perPage)->values();
+            $salesData = $salesData->slice($offset, $perPage)->values();
         }
         
         return [
             'stats' => $stats,
-            'perfumes' => $perfumeStats,
+            'sales' => $salesData,
             'sellers' => $sellerStats,
             'total_count' => $totalCount
         ];

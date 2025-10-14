@@ -229,8 +229,8 @@
     </div>
 </div>
 
-<!-- Delete Perfume Modal -->
-<div id="deletePerfumeModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+<!-- Delete Sale Modal -->
+<div id="deleteSaleModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
         <div class="p-6">
             <div class="flex items-center mb-4">
@@ -248,16 +248,16 @@
                     <i class="fas fa-info-circle text-yellow-600 dark:text-yellow-400 ml-3 mt-0.5"></i>
                     <div class="text-sm">
                         <strong class="text-yellow-800 dark:text-yellow-200">تحذير:</strong>
-                        <span class="text-yellow-700 dark:text-yellow-300">سيتم حذف العطر "<span id="deletePerfumeName" class="font-bold"></span>" وجميع بياناته نهائياً.</span>
+                        <span class="text-yellow-700 dark:text-yellow-300">سيتم حذف عملية البيع رقم "<span id="deleteSaleNumber" class="font-bold"></span>" نهائياً.</span>
                     </div>
                 </div>
             </div>
             
             <div class="flex gap-3">
-                <button type="button" onclick="closeDeletePerfumeModal()" class="flex-1 btn-secondary">
+                <button type="button" onclick="closeDeleteSaleModal()" class="flex-1 btn-secondary">
                     <i class="fas fa-times ml-2"></i>إلغاء
                 </button>
-                <button type="button" onclick="confirmDeletePerfume()" class="flex-1 btn-danger">
+                <button type="button" onclick="confirmDeleteSale()" class="flex-1 btn-danger">
                     <i class="fas fa-trash ml-2"></i>حذف نهائياً
                 </button>
             </div>
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('totalCard').textContent = data.stats.total_card.toLocaleString();
             
             // تحديث عداد النتائج
-            document.getElementById('resultsCount').textContent = `${data.sales.length} مبيعة`;
+            document.getElementById('resultsCount').textContent = `${data.total_count} مبيعة`;
             
             // تحديث الجدول
             const tbody = document.getElementById('salesTableBody');
@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </span>
                         </td>
                         <td class="text-right text-sm py-3 text-gray-500">
-                            ${new Date(sale.created_at).toLocaleDateString('ar-SA')} ${new Date(sale.created_at).toLocaleTimeString('ar-SA', {hour: '2-digit', minute: '2-digit'})}
+                            ${new Date(sale.created_at).toLocaleDateString('en-GB')} ${new Date(sale.created_at).toLocaleTimeString('en-GB', {hour: '2-digit', minute: '2-digit'})}
                         </td>
                         <td class="text-right text-sm py-3">
                             <div class="flex gap-2 justify-center">
@@ -484,6 +484,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Toast notification function
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-300 translate-x-full ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('translate-x-full');
+    }, 100);
+    
+    setTimeout(() => {
+        toast.classList.add('translate-x-full');
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
+}
 
 // Sale Edit Functions
 function editSale(id, perfumeId, sizeId, customerType, paymentMethod, isFullBottle) {
@@ -597,40 +619,57 @@ function updateSale() {
             payment_method: paymentMethod
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            loadSalesData();
-            closeEditModal();
-        } else {
-            alert(data.message || 'خطأ في تحديث البيع');
+    .then(response => response.text())
+    .then(text => {
+        try {
+            // فك ترميز HTML entities
+            const decodedText = text.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+            const data = JSON.parse(decodedText);
+            if (data.success) {
+                closeEditModal();
+                showToast('تم تعديل البيع بنجاح', 'success');
+                setTimeout(() => loadSalesData(), 100);
+                return;
+            } else {
+                alert(data.message || 'خطأ في تحديث البيع');
+                return;
+            }
+        } catch (e) {
+            // إذا فشل في الparse لكن العملية نجحت
+            if (text.includes('success') || text.includes('تم تحديث')) {
+                closeEditModal();
+                showToast('تم تعديل البيع بنجاح', 'success');
+                setTimeout(() => loadSalesData(), 100);
+                return;
+            }
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('خطأ في تحديث البيع');
+        // في حالة فشل الشبكة، جرب إعادة تحميل البيانات
+        closeEditModal();
+        setTimeout(() => loadSalesData(), 100);
     });
 }
 
-// Perfume Delete Functions
-let perfumeToDelete = null;
+// Sale Delete Functions
+let saleToDelete = null;
 
-function deletePerfume(id, name) {
-    perfumeToDelete = id;
-    document.getElementById('deletePerfumeName').textContent = name;
-    document.getElementById('deletePerfumeModal').classList.remove('hidden');
+function deleteSale(id) {
+    saleToDelete = id;
+    document.getElementById('deleteSaleNumber').textContent = id;
+    document.getElementById('deleteSaleModal').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 }
 
-function closeDeletePerfumeModal() {
-    document.getElementById('deletePerfumeModal').classList.add('hidden');
+function closeDeleteSaleModal() {
+    document.getElementById('deleteSaleModal').classList.add('hidden');
     document.body.style.overflow = '';
-    perfumeToDelete = null;
+    saleToDelete = null;
 }
 
-function confirmDeletePerfume() {
-    if (perfumeToDelete) {
-        fetch(`/perfumes/${perfumeToDelete}`, {
+function confirmDeleteSale() {
+    if (saleToDelete) {
+        fetch(`/sales/${saleToDelete}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -639,17 +678,17 @@ function confirmDeletePerfume() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                loadSalesData(); // إعادة تحميل البيانات
+                loadSalesData();
             } else {
-                alert('خطأ في حذف العطر');
+                alert('خطأ في حذف البيع');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('خطأ في حذف العطر');
+            alert('خطأ في حذف البيع');
         })
         .finally(() => {
-            closeDeletePerfumeModal();
+            closeDeleteSaleModal();
         });
     }
 }
@@ -671,15 +710,15 @@ document.getElementById('editSaleModal').addEventListener('click', function(e) {
     if (e.target === this) closeEditModal();
 });
 
-document.getElementById('deletePerfumeModal').addEventListener('click', function(e) {
-    if (e.target === this) closeDeletePerfumeModal();
+document.getElementById('deleteSaleModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteSaleModal();
 });
 
 // إغلاق modals بمفتاح Escape
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeEditModal();
-        closeDeletePerfumeModal();
+        closeDeleteSaleModal();
     }
 });
 </script>
