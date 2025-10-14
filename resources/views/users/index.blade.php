@@ -4,15 +4,10 @@
 @section('page-title', 'المستخدمين')
 
 @section('content')
-<div class="flex justify-between items-center mb-6">
-    <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            <i class="fas fa-users ml-2 text-blue-600"></i>المستخدمين
-        </h2>
-        <p class="text-gray-600 dark:text-gray-300">إدارة مستخدمي النظام</p>
-    </div>
-    <a href="{{ route('users.create') }}" class="btn-primary">
-        <i class="fas fa-plus ml-2"></i>إضافة مستخدم جديد
+<div class="flex justify-center items-center mb-6">
+    <a href="{{ route('users.create') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200">
+        <i class="fas fa-plus text-lg ml-4"></i>
+        <span>إضافة مستخدم جديد</span>
     </a>
 </div>
 

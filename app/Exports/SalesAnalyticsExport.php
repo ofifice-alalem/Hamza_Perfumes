@@ -11,6 +11,26 @@ class SalesAnalyticsExport
     {
         $this->data = $data;
         $this->filters = $filters;
+        
+        // تحديد التواريخ الفعلية المستخدمة
+        $this->actualStartDate = $filters['date_from'] ?? null;
+        $this->actualEndDate = $filters['date_to'] ?? null;
+        
+        // إذا لم يتم تحديد التواريخ، احصل على التواريخ من البيانات
+        if (!$this->actualStartDate || !$this->actualEndDate) {
+            $sales = $data['sales'] ?? [];
+            if (!empty($sales)) {
+                // تحويل Collection إلى array إذا لزم الأمر
+                $salesArray = is_array($sales) ? $sales : $sales->toArray();
+                $dates = array_column($salesArray, 'created_at');
+                if (!$this->actualStartDate) {
+                    $this->actualStartDate = min($dates);
+                }
+                if (!$this->actualEndDate) {
+                    $this->actualEndDate = max($dates);
+                }
+            }
+        }
     }
 
     public function generateCSV()
@@ -30,8 +50,8 @@ class SalesAnalyticsExport
             // معلومات التقرير
             fputcsv($file, ['تقرير المبيعات']);
             fputcsv($file, ['تاريخ التقرير', now()->format('Y-m-d H:i:s')]);
-            fputcsv($file, ['البداية', $this->filters['date_from'] ?? 'غير محدد']);
-            fputcsv($file, ['النهاية', $this->filters['date_to'] ?? 'غير محدد']);
+            fputcsv($file, ['البداية', $this->actualStartDate ? date('Y-m-d', strtotime($this->actualStartDate)) : 'غير محدد']);
+            fputcsv($file, ['النهاية', $this->actualEndDate ? date('Y-m-d', strtotime($this->actualEndDate)) : 'غير محدد']);
             fputcsv($file, []);
             
             // الإحصائيات
@@ -57,29 +77,29 @@ class SalesAnalyticsExport
                 fputcsv($file, []);
             }
             
-            // تحليل المبيعات
-            fputcsv($file, ['تحليل المبيعات']);
+            // بيانات المبيعات الفردية
+            fputcsv($file, ['بيانات المبيعات']);
             fputcsv($file, [
-                'الترتيب',
-                'اسم العطر',
-                'الصنف',
-                'عدد المبيعات',
-                'الزبائن العاديين',
-                'VIP',
-                'إجمالي الكمية (مل)',
-                'إجمالي المبلغ (دينار)'
+                '#',
+                'العطر',
+                'الحجم',
+                'نوع العميل',
+                'طريقة الدفع',
+                'البائع',
+                'السعر',
+                'التاريخ'
             ]);
             
-            foreach ($this->data['perfumes'] as $index => $perfume) {
+            foreach ($this->data['sales'] as $index => $sale) {
                 fputcsv($file, [
-                    $index + 1,
-                    $perfume['name'],
-                    $perfume['category_name'] ?? 'غير مصنف',
-                    $perfume['sales_count'],
-                    $perfume['regular_count'],
-                    $perfume['vip_count'],
-                    number_format($perfume['total_ml']),
-                    number_format($perfume['total_amount'], 2)
+                    $sale['id'],
+                    $sale['perfume_name'],
+                    $sale['size_label'] ?? ($sale['is_full_bottle'] ? 'عبوة كاملة' : 'غير محدد'),
+                    $sale['customer_type'] === 'vip' ? 'VIP' : 'عادي',
+                    $sale['payment_method'] === 'card' ? 'بطاقة' : 'كاش',
+                    $sale['user_name'] ?? 'غير محدد',
+                    number_format($sale['price'], 2),
+                    date('Y-m-d H:i', strtotime($sale['created_at']))
                 ]);
             }
             
@@ -96,11 +116,11 @@ class SalesAnalyticsExport
         $data = [
             'report_info' => [
                 'report_date' => now()->format('Y-m-d H:i:s'),
-                'start_date' => $this->filters['date_from'] ?? 'غير محدد',
-                'end_date' => $this->filters['date_to'] ?? 'غير محدد'
+                'start_date' => $this->actualStartDate ? date('Y-m-d', strtotime($this->actualStartDate)) : 'غير محدد',
+                'end_date' => $this->actualEndDate ? date('Y-m-d', strtotime($this->actualEndDate)) : 'غير محدد'
             ],
             'stats' => $this->data['stats'],
-            'perfumes' => $this->data['perfumes'],
+            'sales' => $this->data['sales'],
             'sellers' => $this->data['sellers'] ?? []
         ];
         
@@ -117,8 +137,8 @@ class SalesAnalyticsExport
         // معلومات التقرير
         $reportInfo = $xml->addChild('report_info');
         $reportInfo->addChild('report_date', now()->format('Y-m-d H:i:s'));
-        $reportInfo->addChild('start_date', $this->filters['date_from'] ?? 'غير محدد');
-        $reportInfo->addChild('end_date', $this->filters['date_to'] ?? 'غير محدد');
+        $reportInfo->addChild('start_date', $this->actualStartDate ? date('Y-m-d', strtotime($this->actualStartDate)) : 'غير محدد');
+        $reportInfo->addChild('end_date', $this->actualEndDate ? date('Y-m-d', strtotime($this->actualEndDate)) : 'غير محدد');
         
         $stats = $xml->addChild('stats');
         $stats->addChild('total_sales', $this->data['stats']['total_sales']);
@@ -138,16 +158,17 @@ class SalesAnalyticsExport
             }
         }
         
-        $perfumes = $xml->addChild('perfumes');
-        foreach ($this->data['perfumes'] as $perfume) {
-            $perfumeNode = $perfumes->addChild('perfume');
-            $perfumeNode->addChild('name', htmlspecialchars($perfume['name']));
-            $perfumeNode->addChild('category_name', htmlspecialchars($perfume['category_name'] ?? 'غير مصنف'));
-            $perfumeNode->addChild('sales_count', $perfume['sales_count']);
-            $perfumeNode->addChild('regular_count', $perfume['regular_count']);
-            $perfumeNode->addChild('vip_count', $perfume['vip_count']);
-            $perfumeNode->addChild('total_ml', $perfume['total_ml']);
-            $perfumeNode->addChild('total_amount', $perfume['total_amount']);
+        $sales = $xml->addChild('sales');
+        foreach ($this->data['sales'] as $sale) {
+            $saleNode = $sales->addChild('sale');
+            $saleNode->addChild('id', $sale['id']);
+            $saleNode->addChild('perfume_name', htmlspecialchars($sale['perfume_name']));
+            $saleNode->addChild('size_label', htmlspecialchars($sale['size_label'] ?? ($sale['is_full_bottle'] ? 'عبوة كاملة' : 'غير محدد')));
+            $saleNode->addChild('customer_type', $sale['customer_type'] === 'vip' ? 'VIP' : 'عادي');
+            $saleNode->addChild('payment_method', $sale['payment_method'] === 'card' ? 'بطاقة' : 'كاش');
+            $saleNode->addChild('user_name', htmlspecialchars($sale['user_name'] ?? 'غير محدد'));
+            $saleNode->addChild('price', $sale['price']);
+            $saleNode->addChild('created_at', date('Y-m-d H:i', strtotime($sale['created_at'])));
         }
         
         return response($xml->asXML())

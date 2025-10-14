@@ -99,97 +99,196 @@
         
         .form-section {
             flex: 1;
-            padding: 60px 50px;
+            padding: 50px 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.03) 0%, transparent 50%);
+            z-index: 1;
+        }
+        
+        .form-section > * {
+            position: relative;
+            z-index: 2;
         }
         
         .login-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .login-header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 1px;
         }
         
         .login-icon {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
+            margin: 0 auto 25px;
             color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.25);
+            transition: all 0.3s ease;
+        }
+        
+        .login-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.35);
         }
         
         .form-floating {
             position: relative;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .form-floating label {
+            padding: 12px 16px;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .form-floating label i {
+            margin-left: 10px;
         }
         
         .form-floating .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 20px 15px 8px;
-            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 14px;
             transition: all 0.3s ease;
-            background: #fafbfc;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
         
         .form-floating .form-control:focus {
             border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15), 
+                        0 8px 25px rgba(102, 126, 234, 0.1);
             background: white;
+            transform: translateY(-1px);
         }
         
-        .form-floating label {
-            padding: 15px;
-            color: #6c757d;
-            font-weight: 500;
+        .form-floating .form-control:focus ~ label {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+            border-color: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .form-floating .form-control:hover {
+            border-color: #cbd5e0;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .form-floating:hover label {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
         
         .btn-login {
             background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
-            border-radius: 15px;
-            padding: 15px;
-            font-weight: 600;
+            border-radius: 16px;
+            padding: 18px;
+            font-weight: 700;
             font-size: 16px;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-login:hover::before {
+            left: 100%;
         }
         
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
         }
         
         .btn-login:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
         
         .alert-modern {
             border: none;
-            border-radius: 15px;
-            padding: 15px 20px;
+            border-radius: 16px;
+            padding: 16px 20px;
             margin-bottom: 25px;
             background: linear-gradient(135deg, #ff6b6b, #ee5a52);
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+            backdrop-filter: blur(10px);
         }
         
         .brand-text {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .brand-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 400;
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 500;
+            color: #64748b;
         }
+        
         
         .welcome-content {
             z-index: 3;
@@ -295,6 +394,107 @@
             50% { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
         }
         
+        /* عناصر زخرفية إضافية */
+        .decorative-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.2);
+            animation: floatIcon 4s ease-in-out infinite;
+            color: rgba(255,255,255,0.8);
+            font-size: 1.2rem;
+        }
+        
+        .geometric-shape {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: floatIcon 6s ease-in-out infinite;
+        }
+        
+        .circle-shape {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        
+        .triangle-shape {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 25px solid rgba(255,255,255,0.1);
+            background: none;
+        }
+        
+        .square-shape {
+            width: 25px;
+            height: 25px;
+            border-radius: 5px;
+        }
+        
+        .decorative-text {
+            position: absolute;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: floatText 5s ease-in-out infinite;
+        }
+        
+        .decorative-line {
+            position: absolute;
+            animation: floatLine 7s ease-in-out infinite;
+        }
+        
+        @keyframes floatIcon {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg); 
+                opacity: 0.6; 
+            }
+            50% { 
+                transform: translateY(-15px) rotate(180deg); 
+                opacity: 1; 
+            }
+        }
+        
+        @keyframes floatText {
+            0%, 100% { 
+                transform: rotate(15deg) translateY(0px); 
+                opacity: 0.5; 
+            }
+            50% { 
+                transform: rotate(15deg) translateY(-10px); 
+                opacity: 0.8; 
+            }
+        }
+        
+        @keyframes floatLine {
+            0%, 100% { 
+                transform: translateX(0px); 
+                opacity: 0.3; 
+            }
+            50% { 
+                transform: translateX(10px); 
+                opacity: 0.7; 
+            }
+        }
+        
         @media (max-width: 768px) {
             .login-card {
                 flex-direction: column;
@@ -348,6 +548,40 @@
                         استمتع بتجربة إدارة متقدمة وسهلة
                     </div>
                 </div>
+                
+                <!-- عناصر وهمية إضافية -->
+                <div class="decorative-elements">
+                    <!-- أيقونات عائمة -->
+                    <div class="floating-icon" style="top: 15%; left: 8%; animation-delay: 0.5s;">
+                        <i class="fas fa-gem"></i>
+                    </div>
+                    <div class="floating-icon" style="top: 25%; right: 12%; animation-delay: 1.5s;">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="floating-icon" style="bottom: 30%; left: 15%; animation-delay: 2.5s;">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="floating-icon" style="bottom: 15%; right: 8%; animation-delay: 3.5s;">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    
+                    <!-- أشكال هندسية -->
+                    <div class="geometric-shape circle-shape" style="top: 10%; right: 5%; animation-delay: 1s;"></div>
+                    <div class="geometric-shape triangle-shape" style="bottom: 20%; left: 5%; animation-delay: 2s;"></div>
+                    <div class="geometric-shape square-shape" style="top: 50%; left: 3%; animation-delay: 3s;"></div>
+                    
+                    <!-- نصوص زخرفية -->
+                    <div class="decorative-text" style="top: 40%; right: 8%; transform: rotate(15deg);">
+                        <span>عطور فاخرة</span>
+                    </div>
+                    <div class="decorative-text" style="bottom: 25%; left: 8%; transform: rotate(-10deg);">
+                        <span>جودة عالية</span>
+                    </div>
+                    
+                    <!-- خطوط زخرفية -->
+                    <div class="decorative-line" style="top: 35%; left: 0; width: 60px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);"></div>
+                    <div class="decorative-line" style="bottom: 40%; right: 0; width: 80px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);"></div>
+                </div>
             </div>
             
             <div class="form-section">
@@ -369,19 +603,19 @@
                     @csrf
                     
                     <div class="form-floating">
-                        <input type="text" class="form-control" id="username" name="username" 
-                               value="{{ old('username') }}" placeholder="اسم المستخدم" required>
                         <label for="username">
                             <i class="fas fa-user me-2"></i>اسم المستخدم
                         </label>
+                        <input type="text" class="form-control" id="username" name="username" 
+                               value="{{ old('username') }}" placeholder="أدخل اسم المستخدم" required>
                     </div>
 
                     <div class="form-floating">
-                        <input type="password" class="form-control" id="password" name="password" 
-                               placeholder="كلمة المرور" required>
                         <label for="password">
                             <i class="fas fa-lock me-2"></i>كلمة المرور
                         </label>
+                        <input type="password" class="form-control" id="password" name="password" 
+                               placeholder="أدخل كلمة المرور" required>
                     </div>
 
                     <button type="submit" class="btn btn-login w-100 text-white">

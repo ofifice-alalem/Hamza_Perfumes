@@ -50,12 +50,24 @@ class DashboardController extends Controller
     {
         $query = Sale::with(['perfume.category', 'size', 'user']);
         
+        // تحديد تاريخ البداية - إذا لم يُحدد، استخدم أقدم عملية بيع
         if ($request->date_from) {
             $query->whereDate('created_at', '>=', $request->date_from);
+        } else {
+            $oldestSale = Sale::orderBy('created_at', 'asc')->first();
+            if ($oldestSale) {
+                $query->whereDate('created_at', '>=', $oldestSale->created_at->toDateString());
+            }
         }
         
+        // تحديد تاريخ النهاية - إذا لم يُحدد، استخدم أحدث عملية بيع
         if ($request->date_to) {
             $query->whereDate('created_at', '<=', $request->date_to);
+        } else {
+            $newestSale = Sale::orderBy('created_at', 'desc')->first();
+            if ($newestSale) {
+                $query->whereDate('created_at', '<=', $newestSale->created_at->toDateString());
+            }
         }
         
         if ($request->customer_type) {
@@ -89,7 +101,8 @@ class DashboardController extends Controller
             'total_customers' => $sales->count(),
             'total_ml' => $this->calculateTotalML($sales),
             'total_cash' => $sales->where('payment_method', 'cash')->sum('price'),
-            'total_card' => $sales->where('payment_method', 'card')->sum('price')
+            'total_card' => $sales->where('payment_method', 'card')->sum('price'),
+            'avg_sale' => $sales->avg('price') ?? 0,
         ];
         
         // إحصائيات البائعين
@@ -119,6 +132,37 @@ class DashboardController extends Controller
                 'created_at' => $sale->created_at->toISOString()
             ];
         })->sortByDesc('created_at')->values();
+
+        // تحليلات العطور لتقارير التصدير
+        $perfumeAnalytics = $sales
+            ->groupBy('perfume_id')
+            ->map(function ($perfumeSales) {
+                $first = $perfumeSales->first();
+                $categoryName = $first && $first->perfume && $first->perfume->category
+                    ? $first->perfume->category->name
+                    : null;
+
+                // إجمالي ML
+                $totalMl = 0;
+                foreach ($perfumeSales as $sale) {
+                    if ($sale->size) {
+                        $ml = (int) filter_var($sale->size->label, FILTER_SANITIZE_NUMBER_INT);
+                        $totalMl += $ml;
+                    }
+                }
+
+                return [
+                    'name' => $first && $first->perfume ? $first->perfume->name : 'غير محدد',
+                    'category_name' => $categoryName,
+                    'sales_count' => $perfumeSales->count(),
+                    'regular_count' => $perfumeSales->where('customer_type', 'regular')->count(),
+                    'vip_count' => $perfumeSales->where('customer_type', 'vip')->count(),
+                    'total_ml' => $totalMl,
+                    'total_amount' => $perfumeSales->sum('price'),
+                ];
+            })
+            ->sortByDesc('total_amount')
+            ->values();
         
         $totalCount = $salesData->count();
         
@@ -133,6 +177,7 @@ class DashboardController extends Controller
             'stats' => $stats,
             'sales' => $salesData,
             'sellers' => $sellerStats,
+            'perfumes' => $perfumeAnalytics,
             'total_count' => $totalCount
         ];
     }

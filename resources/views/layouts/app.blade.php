@@ -290,7 +290,20 @@
                         <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 transition-colors">
                             <i class="fas fa-bars text-xl"></i>
                         </button>
-                        <h2 class="text-lg lg:text-xl font-semibold text-gray-900 mr-2 lg:mr-4">@yield('page-title', 'الصفحة الرئيسية')</h2>
+                        @php
+                            $icon = 'images/dashboard.png';
+                            if (request()->routeIs('users.*')) $icon = 'images/users.png';
+                            elseif (request()->routeIs('perfumes.*')) $icon = 'images/perfumes.png';
+                            elseif (request()->routeIs('categories.*')) $icon = 'images/categories.png';
+                            elseif (request()->routeIs('sizes.*')) $icon = 'images/sizes.png';
+                            elseif (request()->routeIs('prices.*')) $icon = 'images/prices.png';
+                            elseif (request()->routeIs('sales.*')) $icon = 'images/sales.png';
+                        @endphp
+                        <div class="hidden sm:flex items-center mr-3 lg:mr-5">
+                            <img src="{{ asset($icon) }}" alt="" class="w-6 h-6 mr-3 object-contain">
+                            <h2 class="text-base lg:text-lg font-extrabold text-gray-900 leading-none">@yield('page-title', 'الصفحة الرئيسية')</h2>
+                        </div>
+                        <h2 class="sm:hidden text-lg lg:text-xl font-semibold text-gray-900 mr-2 lg:mr-4">@yield('page-title', 'الصفحة الرئيسية')</h2>
                     </div>
                     
                     <!-- Search Bar - Center -->
@@ -299,15 +312,16 @@
                             <input type="text" 
                                    id="globalSearch" 
                                    placeholder="بحث عن عطر..."
-                                   class="form-input pr-12 w-full" 
+                                   class="form-input pr-12 w-full rounded-full bg-gray-50 border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder-gray-400 shadow-inner" 
                                    autocomplete="off">
-                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500"></i>
                             <div id="globalSearchDropdown" class="search-dropdown hidden"></div>
                         </div>
                     </div>
                     
-                    <div class="text-xs lg:text-sm text-gray-500" id="currentDate">
-                        <!-- سيتم تحديثه بـ JavaScript -->
+                    <div class="text-xs lg:text-sm text-gray-600 bg-gray-100 border border-gray-200 rounded-full px-4 py-1.5 flex items-center" id="currentDate">
+                        <i class="fas fa-calendar-alt ml-3 text-blue-600"></i>
+                        <span id="currentDateText"><!-- سيتم تحديثه بـ JavaScript --></span>
                     </div>
                 </div>
             </div>
@@ -361,7 +375,8 @@
                 const year = now.getFullYear();
                 const month = String(now.getMonth() + 1).padStart(2, '0');
                 const day = String(now.getDate()).padStart(2, '0');
-                dateElement.textContent = `${year}/${month}/${day}`;
+                const textSpan = document.getElementById('currentDateText');
+                (textSpan || dateElement).textContent = `${year}/${month}/${day}`;
             }
         });
 

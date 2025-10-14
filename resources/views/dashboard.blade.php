@@ -4,76 +4,117 @@
 @section('page-title', 'لوحة التحكم')
 
 @section('content')
-<div class="flex justify-between items-center mb-6">
-    <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center">
-            <img src="{{ asset('images/dashboard.png') }}" alt="لوحة التحكم" class="w-7 h-7 mr-3 object-contain">
-            <span>لوحة التحكم</span>
-        </h2>
-        <p class="text-gray-600 dark:text-gray-300">نظرة شاملة على العطور والمبيعات</p>
-    </div>
-</div>
+
 
 <!-- فلاتر المبيعات -->
-<div class="card mb-6">
-    <div class="card-body">
+<div class="card mb-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+    <div class="card-body p-4 lg:p-6">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center ml-2">
+                    <i class="fas fa-sliders-h text-sm"></i>
+                </div>
+                <h3 class="text-sm font-extrabold text-gray-900">فلاتر البحث</h3>
+            </div>
+            <button type="button" id="resetFiltersBtn" class="text-xs font-medium text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-full border border-gray-200 hover:border-red-300 transition">
+                <i class="fas fa-undo ml-2"></i>إعادة تعيين
+            </button>
+        </div>
         <form id="salesFilters">
             <!-- الصف الأول -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <div>
-                    <label class="form-label">من تاريخ</label>
-                    <input type="date" class="form-input" id="date_from" name="date_from">
+                    <label class="form-label text-sm text-gray-700 font-medium">من تاريخ</label>
+                    <div class="relative group">
+                        <input type="date" class="form-input rounded-full bg-gray-50 border-gray-200 shadow-inner hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" id="date_from" name="date_from">
+                    </div>
                 </div>
                 <div>
-                    <label class="form-label">إلى تاريخ</label>
-                    <input type="date" class="form-input" id="date_to" name="date_to">
+                    <label class="form-label text-sm text-gray-700 font-medium">إلى تاريخ</label>
+                    <div class="relative group">
+                        <input type="date" class="form-input rounded-full bg-gray-50 border-gray-200 shadow-inner hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" id="date_to" name="date_to">
+                    </div>
                 </div>
                 <div>
-                    <label class="form-label">نوع العميل</label>
-                    <select class="form-select" id="customer_type" name="customer_type">
+                    <label class="form-label text-sm text-gray-700 font-medium">نوع العميل</label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none"></i>
+                        <span class="pointer-events-none absolute left-8 top-1/2 -translate-y-1/2 text-blue-500">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                        <select class="appearance-none form-select rounded-full bg-gray-50 border-gray-200 shadow-inner hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm pl-16" id="customer_type" name="customer_type">
                         <option value="">الكل</option>
                         <option value="regular">عادي</option>
                         <option value="vip">VIP</option>
-                    </select>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="form-label">الصنف</label>
-                    <select class="form-select" id="category_id" name="category_id">
+                    <label class="form-label text-sm text-gray-700 font-medium">الصنف</label>
+                    <div class="relative">
+                        <i class="fas fa-tags absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none"></i>
+                        <span class="pointer-events-none absolute left-8 top-1/2 -translate-y-1/2 text-blue-500">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                        <select class="appearance-none form-select rounded-full bg-gray-50 border-gray-200 shadow-inner hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm pl-16" id="category_id" name="category_id">
                         <option value="">جميع الأصناف</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
                         <option value="uncategorized">غير مصنف</option>
-                    </select>
+                        </select>
+                    </div>
                 </div>
             </div>
             
+            <div id="activeFilters" class="flex flex-wrap gap-2 mb-4"></div>
+
+            <hr class="my-5 border-gray-200">
+
             <!-- الصف الثاني -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="form-label">البائع</label>
-                    <select class="form-select" id="user_id" name="user_id">
+                    <label class="form-label text-sm text-gray-700 font-medium">البائع</label>
+                    <div class="relative">
+                        <i class="fas fa-user-tie absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none"></i>
+                        <span class="pointer-events-none absolute left-8 top-1/2 -translate-y-1/2 text-blue-500">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                        <select class="appearance-none form-select rounded-full bg-gray-50 border-gray-200 shadow-inner hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm pl-16" id="user_id" name="user_id">
                         <option value="">جميع البائعين</option>
                         @foreach($users as $user)
                             <option value="{{ $user->id }}">{{ $user->name }}</option>
                         @endforeach
-                    </select>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="form-label">طريقة الدفع</label>
-                    <select class="form-select" id="payment_method" name="payment_method">
+                    <label class="form-label text-sm text-gray-700 font-medium">طريقة الدفع</label>
+                    <div class="relative">
+                        <i class="fas fa-credit-card absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none"></i>
+                        <span class="pointer-events-none absolute left-8 top-1/2 -translate-y-1/2 text-blue-500">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                        <select class="appearance-none form-select rounded-full bg-gray-50 border-gray-200 shadow-inner hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm pl-16" id="payment_method" name="payment_method">
                         <option value="">الكل</option>
                         <option value="cash">كاش</option>
                         <option value="card">بطاقة</option>
-                    </select>
+                        </select>
+                    </div>
                 </div>
                 <div>
-                    <label class="form-label">ترتيب حسب</label>
-                    <select class="form-select" id="sort_by" name="sort_by">
+                    <label class="form-label text-sm text-gray-700 font-medium">ترتيب حسب</label>
+                    <div class="relative">
+                        <i class="fas fa-sort-amount-down absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 pointer-events-none"></i>
+                        <span class="pointer-events-none absolute left-8 top-1/2 -translate-y-1/2 text-blue-500">
+                            <i class="fas fa-chevron-down"></i>
+                        </span>
+                        <select class="appearance-none form-select rounded-full bg-gray-50 border-gray-200 shadow-inner hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm pl-16" id="sort_by" name="sort_by">
                         <option value="sales_count">عدد المبيعات</option>
                         <option value="total_amount">إجمالي المبلغ</option>
                         <option value="total_ml">إجمالي الكمية (مل)</option>
-                    </select>
+                        </select>
+                    </div>
                 </div>
             </div>
         </form>
@@ -123,19 +164,19 @@
                         <i class="fas fa-download ml-2"></i>تصدير
                     </button>
                     <div id="exportMenu" class="hidden absolute left-0 mt-2 w-48 bg-white dark:bg-gray-700 rounded-lg shadow-lg z-50 border border-gray-200 dark:border-gray-600">
-                        <a href="#" onclick="exportData('csv')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-t-lg transition-colors">
+                        <a href="javascript:void(0)" onclick="exportData('csv', event)" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-t-lg transition-colors">
                             <i class="fas fa-file-csv ml-3 text-green-500"></i>CSV
                         </a>
                         <hr class="border-gray-200 dark:border-gray-600">
-                        <a href="#" onclick="exportData('json')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                        <a href="javascript:void(0)" onclick="exportData('json', event)" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
                             <i class="fas fa-file-code ml-3 text-blue-500"></i>JSON
                         </a>
                         <hr class="border-gray-200 dark:border-gray-600">
-                        <a href="#" onclick="exportData('xml')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-b-lg transition-colors">
+                        <a href="javascript:void(0)" onclick="exportData('xml', event)" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-b-lg transition-colors">
                             <i class="fas fa-file-code ml-3 text-yellow-500"></i>XML
                         </a>
                         <hr class="border-gray-200 dark:border-gray-600">
-                        <a href="#" onclick="exportData('excel')" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-b-lg transition-colors">
+                        <a href="javascript:void(0)" onclick="exportData('excel', event)" class="flex items-center px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-b-lg transition-colors">
                             <i class="fas fa-file-excel ml-3 text-green-600"></i>Excel
                         </a>
                     </div>
@@ -164,6 +205,7 @@
                 </tbody>
             </table>
         </div>
+        <div id="tablePagination" class="py-4"></div>
     </div>
 </div>
 
@@ -276,13 +318,34 @@ document.addEventListener('DOMContentLoaded', function() {
         element.addEventListener('change', loadSalesData);
     });
     
+    // إعادة تعيين الفلاتر
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            const form = document.getElementById('salesFilters');
+            if (form) {
+                form.reset();
+            }
+            // إعادة الصفحة الأولى ثم إعادة التحميل
+            if (typeof currentPage !== 'undefined') {
+                currentPage = 1;
+            }
+            loadSalesData();
+        });
+    }
+
     // تصدير البيانات
     window.exportData = function(format, event) {
-        event?.preventDefault();
+        try { event && event.preventDefault && event.preventDefault(); } catch (e) {}
         
         const formData = new FormData(document.getElementById('salesFilters'));
         formData.append('format', format);
-        const params = new URLSearchParams(formData);
+        const params = new URLSearchParams();
+        formData.forEach((value, key) => {
+            if (value !== null && value !== undefined) {
+                params.append(key, value);
+            }
+        });
         
         // إظهار رسالة تحميل
         const button = document.getElementById('exportButton');
@@ -292,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // محاولة التصدير
         try {
-            window.location.href = `/api/export-sales-analytics?${params}`;
+            window.location.href = `/api/export-sales-analytics?${params.toString()}`;
         } catch (error) {
             console.error('خطأ في التصدير:', error);
             alert('حدث خطأ أثناء التصدير');
@@ -348,46 +411,50 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function addPagination(totalCount) {
         const totalPages = Math.ceil(totalCount / 50);
-        let paginationHtml = '';
-        
+        const container = document.getElementById('tablePagination');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (totalPages === 0) return;
+
+        let paginationHtml = '<div class="pagination-container flex justify-center"><div class="flex gap-2 items-center">';
+
+        const btn = (content, disabled, onClick, extraClass = '') => {
+            const base = 'min-w-[2.5rem] h-10 px-3 rounded-full flex items-center justify-center transition-colors';
+            const normalCls = 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50';
+            const disabledCls = 'bg-gray-200 text-gray-400 cursor-not-allowed';
+            const activeCls = 'bg-blue-600 text-white border border-blue-600 hover:bg-blue-600';
+            // إذا كان extraClass يحتوي على bg-blue-600 نستخدم مظهر العنصر الفعّال فقط بدون المظهر العادي
+            const isActive = /bg-blue-600/.test(extraClass);
+            const stateCls = disabled ? disabledCls : (isActive ? activeCls : normalCls);
+            const clickAttr = disabled ? 'disabled' : `onclick=\"${onClick}\"`;
+            return `<button class="${base} ${stateCls} ${extraClass}" ${clickAttr}>${content}</button>`;
+        };
+
+        // أزرار التحكم (تظهر فقط إذا كان هناك أكثر من صفحة)
         if (totalPages > 1) {
-            paginationHtml = '<div class="pagination-container flex justify-center my-6"><div class="flex gap-2 items-center">';
-            
-            // زر الصفحة الأولى
-            const firstDisabled = currentPage === 1;
-            const firstClass = firstDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
-            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${firstClass} transition-colors" onclick="loadPage(1)" ${firstDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-right"></i></button>`;
-            
-            // زر السابق
-            const prevDisabled = currentPage === 1;
-            const prevClass = prevDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
-            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${prevClass} transition-colors" onclick="loadPage(${currentPage - 1})" ${prevDisabled ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
-            
-            // أرقام الصفحات
-            const startPage = Math.max(1, currentPage - 2);
-            const endPage = Math.min(totalPages, currentPage + 2);
-            
-            for (let i = startPage; i <= endPage; i++) {
-                const isActive = i === currentPage;
-                const btnClass = isActive ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50';
-                paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${btnClass} transition-colors font-semibold" onclick="loadPage(${i})">${i}</button>`;
-            }
-            
-            // زر التالي
-            const nextDisabled = currentPage === totalPages;
-            const nextClass = nextDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
-            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${nextClass} transition-colors" onclick="loadPage(${currentPage + 1})" ${nextDisabled ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
-            
-            // زر الصفحة الأخيرة
-            const lastDisabled = currentPage === totalPages;
-            const lastClass = lastDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white';
-            paginationHtml += `<button class="w-10 h-10 rounded-full flex items-center justify-center ${lastClass} transition-colors" onclick="loadPage(${totalPages})" ${lastDisabled ? 'disabled' : ''}><i class="fas fa-angle-double-left"></i></button>`;
-            
-            paginationHtml += '</div></div>';
+            paginationHtml += btn('<i class="fas fa-angle-double-right"></i>', currentPage === 1, 'loadPage(1)');
+            paginationHtml += btn('<i class="fas fa-chevron-right"></i>', currentPage === 1, `loadPage(${currentPage - 1})`);
         }
-        
-        // إضافة pagination في نهاية الصفحة
-        document.body.insertAdjacentHTML('beforeend', paginationHtml);
+
+        // أرقام الصفحات (نطاق صغير حول الحالية)
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+        for (let i = startPage; i <= endPage; i++) {
+            const isActive = i === currentPage;
+            const classes = isActive ? 'bg-blue-600 text-white border border-blue-600 hover:bg-blue-600' : '';
+            paginationHtml += btn(`${i}`, false, `loadPage(${i})`, classes);
+        }
+
+        // التالي والأخير (تظهر فقط إذا كان هناك أكثر من صفحة)
+        if (totalPages > 1) {
+            paginationHtml += btn('<i class="fas fa-chevron-left"></i>', currentPage === totalPages, `loadPage(${currentPage + 1})`);
+            paginationHtml += btn('<i class="fas fa-angle-double-left"></i>', currentPage === totalPages, `loadPage(${totalPages})`);
+        }
+
+        paginationHtml += '</div></div>';
+
+        container.innerHTML = paginationHtml;
     }
     
     async function loadSalesData() {
@@ -395,6 +462,45 @@ document.addEventListener('DOMContentLoaded', function() {
         const params = new URLSearchParams(formData);
         
         try {
+            // تحديث شارات الفلاتر الفعالة
+            const active = [];
+            const dateFrom = formData.get('date_from');
+            const dateTo = formData.get('date_to');
+            const customerType = formData.get('customer_type');
+            const categoryId = formData.get('category_id');
+            const userId = formData.get('user_id');
+            const paymentMethod = formData.get('payment_method');
+            const sortBy = formData.get('sort_by');
+
+            if (dateFrom) active.push({ key: 'date_from', label: `من ${dateFrom}` });
+            if (dateTo) active.push({ key: 'date_to', label: `إلى ${dateTo}` });
+            if (customerType) active.push({ key: 'customer_type', label: customerType === 'vip' ? 'عميل VIP' : 'عميل عادي' });
+            if (categoryId) active.push({ key: 'category_id', label: 'صنف محدد' });
+            if (userId) active.push({ key: 'user_id', label: 'بائع محدد' });
+            if (paymentMethod) active.push({ key: 'payment_method', label: paymentMethod === 'card' ? 'بطاقة' : 'كاش' });
+            if (sortBy && sortBy !== 'sales_count') active.push({ key: 'sort_by', label: 'ترتيب مخصص' });
+
+            const chips = active.map(f => `
+                <span class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-3 py-1 text-xs font-medium">
+                    <i class="fas fa-filter ml-1"></i>${f.label}
+                    <button type="button" class="text-blue-700 hover:text-blue-900" data-remove-filter="${f.key}"><i class="fas fa-times"></i></button>
+                </span>
+            `).join('');
+            const chipsContainer = document.getElementById('activeFilters');
+            if (chipsContainer) chipsContainer.innerHTML = chips;
+
+            // معالجة إزالة الشارات
+            chipsContainer?.querySelectorAll('[data-remove-filter]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const key = btn.getAttribute('data-remove-filter');
+                    const el = document.querySelector(`[name="${key}"]`);
+                    if (el) {
+                        el.value = '';
+                        el.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+
             params.append('page', currentPage);
             const response = await fetch(`/api/sales-analytics?${params}`);
             const data = await response.json();
@@ -726,6 +832,20 @@ document.addEventListener('keydown', function(e) {
 
 <style>
 /* تحسينات إضافية للتصميم */
+.filters-date-blue-note {
+    /* helper class placeholder if needed */
+}
+
+/* تلوين أيقونة منتقي التاريخ إلى الأزرق (WebKit: Chrome/Safari/Edge) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(25%) sepia(96%) saturate(2322%) hue-rotate(206deg) brightness(95%) contrast(95%);
+    opacity: 0.9;
+}
+
+/* محاولة عامة لإظهار لمسة زرقاء على بعض المتصفحات */
+input[type="date"] {
+    accent-color: #2563eb; /* blue-600 */
+}
 .stats-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
