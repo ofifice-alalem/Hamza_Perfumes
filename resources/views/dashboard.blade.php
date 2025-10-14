@@ -6,8 +6,9 @@
 @section('content')
 <div class="flex justify-between items-center mb-6">
     <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            <i class="fas fa-tachometer-alt ml-2 text-blue-600"></i>لوحة التحكم
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 flex items-center">
+            <img src="{{ asset('images/dashboard.png') }}" alt="لوحة التحكم" class="w-7 h-7 mr-3 object-contain">
+            <span>لوحة التحكم</span>
         </h2>
         <p class="text-gray-600 dark:text-gray-300">نظرة شاملة على العطور والمبيعات</p>
     </div>

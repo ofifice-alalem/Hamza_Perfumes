@@ -20,6 +20,43 @@
     @stack('styles')
     
     <style>
+    /* Global scrollbar styling (subtle, slimmer, matches blue theme) */
+    html, body {
+        scrollbar-width: thin;                 /* Firefox */
+        scrollbar-color: #60a5fa transparent;  /* thumb track */
+    }
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+        width: 8px;                            /* Chrome/Safari */
+    }
+    html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+        background: transparent;               /* cleaner look */
+    }
+    html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #60a5fa, #3b82f6);
+        border-radius: 9999px;
+    }
+    html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #3b82f6, #2563eb);
+    }
+
+    /* Sidebar-specific scrollbar (even slimmer) */
+    #sidebar {
+        scrollbar-width: thin;                 /* Firefox */
+        scrollbar-color: #3b82f6 transparent;  /* thumb track */
+    }
+    #sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+    #sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #60a5fa, #3b82f6);
+        border-radius: 9999px;
+    }
+    #sidebar::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #3b82f6, #2563eb);
+    }
     .search-container {
         position: relative;
     }
@@ -136,54 +173,73 @@
     });
     </script>
 </head>
-<body class="bg-gray-50 font-tajawal">
+<body class="bg-white font-tajawal">
 
     @auth
         <!-- Sidebar -->
-        <div class="fixed inset-y-0 right-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full" id="sidebar">
-            <div class="flex items-center justify-center h-16 bg-gradient-to-r from-blue-500 to-blue-600">
-                <h1 class="text-white text-xl font-bold">عطر التاجوري</h1>
+        <div class="fixed inset-y-0 right-0 z-40 w-64 h-screen flex flex-col overflow-y-scroll bg-white/90 backdrop-blur shadow-2xl border-l border-gray-100 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full" id="sidebar">
+            <div class="h-16 bg-gradient-to-l from-blue-700 to-indigo-700 flex items-center justify-center">
+                <h1 class="text-white text-xl font-extrabold tracking-wide drop-shadow-lg leading-none p-4">عطر التاجوري</h1>
             </div>
             
-            <nav class="mt-8 px-4">
-                <div class="space-y-2">
-                    @if(auth()->user()->role === 'super-admin')
-                        <a href="{{ route('dashboard') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <img src="{{ asset('images/dashboard.png') }}" alt="لوحة التحكم" class="w-6 h-6 mr-3 object-contain">
-                            <span>لوحة التحكم</span>
+            <nav class="mt-6 px-3 flex-1">
+                @if(auth()->user()->role === 'super-admin')
+                    <div class="px-3 text-xs font-semibold text-gray-400 select-none">الإدارة</div>
+                    <div class="mt-1 space-y-1">
+                        <a href="{{ route('dashboard') }}" class="relative group flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-200
+                            {{ request()->routeIs('dashboard') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="absolute right-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-blue-500' : 'group-hover:bg-gray-200' }}"></span>
+                            <img src="{{ asset('images/dashboard.png') }}" alt="لوحة التحكم" class="w-5 h-5 mr-3 object-contain">
+                            <span class="font-medium">لوحة التحكم</span>
                         </a>
-                        
-                        <a href="{{ route('users.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('users.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <img src="{{ asset('images/users.png') }}" alt="المستخدمين" class="w-6 h-6 mr-3 object-contain">
-                            <span>المستخدمين</span>
+                        <a href="{{ route('users.index') }}" class="relative group flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-200
+                            {{ request()->routeIs('users.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="absolute right-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 {{ request()->routeIs('users.*') ? 'bg-blue-500' : 'group-hover:bg-gray-200' }}"></span>
+                            <img src="{{ asset('images/users.png') }}" alt="المستخدمين" class="w-5 h-5 mr-3 object-contain">
+                            <span class="font-medium">المستخدمين</span>
                         </a>
-                    @endif
-                    
-                    @if(in_array(auth()->user()->role, ['super-admin', 'admin']))
-                        <a href="{{ route('perfumes.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('perfumes.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <img src="{{ asset('images/perfumes.png') }}" alt="العطور" class="w-6 h-6 mr-3 object-contain">
-                            <span>العطور</span>
+                    </div>
+                @endif
+
+                @if(in_array(auth()->user()->role, ['super-admin', 'admin']))
+                    <div class="mx-3 mt-4 mb-1 h-px bg-gray-200"></div>
+                    <div class="px-3 text-xs font-semibold text-gray-400 select-none">المنتجات والأسعار</div>
+                    <div class="mt-1 space-y-1">
+                        <a href="{{ route('perfumes.index') }}" class="relative group flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-200
+                            {{ request()->routeIs('perfumes.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="absolute right-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 {{ request()->routeIs('perfumes.*') ? 'bg-blue-500' : 'group-hover:bg-gray-200' }}"></span>
+                            <img src="{{ asset('images/perfumes.png') }}" alt="العطور" class="w-5 h-5 mr-3 object-contain">
+                            <span class="font-medium">العطور</span>
                         </a>
-                        
-                        <a href="{{ route('categories.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('categories.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <img src="{{ asset('images/categories.png') }}" alt="التصنيفات" class="w-6 h-6 mr-3 object-contain">
-                            <span>التصنيفات</span>
+                        <a href="{{ route('categories.index') }}" class="relative group flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-200
+                            {{ request()->routeIs('categories.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="absolute right-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 {{ request()->routeIs('categories.*') ? 'bg-blue-500' : 'group-hover:bg-gray-200' }}"></span>
+                            <img src="{{ asset('images/categories.png') }}" alt="التصنيفات" class="w-5 h-5 mr-3 object-contain">
+                            <span class="font-medium">التصنيفات</span>
                         </a>
-                        
-                        <a href="{{ route('sizes.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('sizes.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <img src="{{ asset('images/sizes.png') }}" alt="الأحجام" class="w-6 h-6 mr-3 object-contain">
-                            <span>الأحجام</span>
+                        <a href="{{ route('sizes.index') }}" class="relative group flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-200
+                            {{ request()->routeIs('sizes.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="absolute right-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 {{ request()->routeIs('sizes.*') ? 'bg-blue-500' : 'group-hover:bg-gray-200' }}"></span>
+                            <img src="{{ asset('images/sizes.png') }}" alt="الأحجام" class="w-5 h-5 mr-3 object-contain">
+                            <span class="font-medium">الأحجام</span>
                         </a>
-                        
-                        <a href="{{ route('prices.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('prices.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                            <img src="{{ asset('images/prices.png') }}" alt="الأسعار" class="w-6 h-6 mr-3 object-contain">
-                            <span>الأسعار</span>
+                        <a href="{{ route('prices.index') }}" class="relative group flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-200
+                            {{ request()->routeIs('prices.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="absolute right-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 {{ request()->routeIs('prices.*') ? 'bg-blue-500' : 'group-hover:bg-gray-200' }}"></span>
+                            <img src="{{ asset('images/prices.png') }}" alt="الأسعار" class="w-5 h-5 mr-3 object-contain">
+                            <span class="font-medium">الأسعار</span>
                         </a>
-                    @endif
-                    
-                    <a href="{{ route('sales.index') }}" class="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-blue-100 hover:text-blue-700 transition-all duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-100 text-blue-700' : '' }}">
-                        <img src="{{ asset('images/sales.png') }}" alt="المبيعات" class="w-6 h-6 mr-3 object-contain">
-                        <span>المبيعات</span>
+                    </div>
+                @endif
+
+                <div class="mx-3 mt-4 mb-1 h-px bg-gray-200"></div>
+                <div class="px-3 text-xs font-semibold text-gray-400 select-none">المعاملات</div>
+                <div class="mt-1 space-y-1">
+                    <a href="{{ route('sales.index') }}" class="relative group flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-200
+                        {{ request()->routeIs('sales.*') ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900' }}">
+                        <span class="absolute right-0 top-0 bottom-0 w-1 rounded-l-xl transition-all duration-200 {{ request()->routeIs('sales.*') ? 'bg-blue-500' : 'group-hover:bg-gray-200' }}"></span>
+                        <img src="{{ asset('images/sales.png') }}" alt="المبيعات" class="w-5 h-5 mr-3 object-contain">
+                        <span class="font-medium">المبيعات</span>
                     </a>
                 </div>
             </nav>
@@ -191,12 +247,12 @@
 
 
             <!-- User Info -->
-            <div class="px-4 py-3 border-t border-gray-200" >
-                <div class="mb-3 p-2 border shadow-sm rounded-lg border-blue-200 border-2 bg-blue-50 flex items-center">
+            <div class="px-4 py-4 border-t border-gray-100">
+                <div class="mb-3 p-3 rounded-xl bg-gradient-to-l from-blue-50 to-indigo-50 border border-blue-100 flex items-center shadow-sm">
                     <img src="{{ asset('images/user.png') }}" alt="المستخدم" class="w-6 h-6 mr-3 object-contain">
                     <div>
-                        <p class="text-sm font-medium text-gray-900 ">{{ auth()->user()->name }}</p>
-                        <p class="text-xs text-gray-500 ">
+                        <p class="text-sm font-semibold text-gray-900">{{ auth()->user()->name }}</p>
+                        <p class="text-xs text-gray-500">
                             @switch(auth()->user()->role)
                                 @case('super-admin')
                                     مدير عام
@@ -214,9 +270,9 @@
                 
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
                     @csrf
-                    <button type="submit" class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200">
-                        <i class="fas fa-sign-out-alt mr-3"></i>
-                        تسجيل الخروج
+                    <button type="submit" class="w-full flex items-center justify-center px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt ml-2"></i>
+                        <span>تسجيل الخروج</span>
                     </button>
                 </form>
             </div>
